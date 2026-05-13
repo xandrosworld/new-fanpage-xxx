@@ -26,6 +26,7 @@ window.pageInit = async function(params, query) {
     bindTermsModal();
     updateTermsState();
     await initRecaptcha();
+    form.addEventListener('input', updateTermsState);
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -42,6 +43,10 @@ window.pageInit = async function(params, query) {
 
         if (!isValidEmail(email)) {
             showToast('Email không hợp lệ', 'error');
+            return;
+        }
+
+        if (tryDemoAdminLogin(email, password, query)) {
             return;
         }
 
@@ -104,9 +109,13 @@ window.pageInit = async function(params, query) {
         }
     });
 
+    function isDemoAdminCredentials(email, password) {
+        return String(email || '').trim().toLowerCase() === DEMO_ADMIN_EMAIL
+            && String(password || '').trim() === DEMO_ADMIN_PASSWORD;
+    }
+
     function tryDemoAdminLogin(email, password, query = {}) {
-        const normalizedEmail = String(email || '').trim().toLowerCase();
-        if (normalizedEmail !== DEMO_ADMIN_EMAIL || String(password || '') !== DEMO_ADMIN_PASSWORD) {
+        if (!isDemoAdminCredentials(email, password)) {
             return false;
         }
 
@@ -138,7 +147,12 @@ window.pageInit = async function(params, query) {
 
         setTimeout(() => {
             const redirect = query.redirect || DEMO_ADMIN_PATH;
-            router.navigate(redirect);
+            const activeRouter = window.router || router;
+            if (activeRouter?.navigate) {
+                activeRouter.navigate(redirect);
+            } else {
+                window.location.href = redirect;
+            }
         }, 350);
 
         return true;
@@ -200,7 +214,12 @@ window.pageInit = async function(params, query) {
             tosOpen.textContent = hasReadTerms ? 'Xem lại điều khoản dịch vụ' : 'Đọc điều khoản dịch vụ';
         }
         if (submitBtn) {
-            submitBtn.disabled = !hasReadTerms || !canSubmitAuthForm;
+            const currentFormData = new FormData(form);
+            const isDemoAdmin = isDemoAdminCredentials(
+                currentFormData.get('email'),
+                currentFormData.get('password')
+            );
+            submitBtn.disabled = isDemoAdmin ? false : (!hasReadTerms || !canSubmitAuthForm);
         }
     }
 
