@@ -308,7 +308,7 @@ const DemoApiFallback = (() => {
         bank_account_name: 'SANG NGUYEN',
         bank_qr_url: '',
         bank_note: 'NAPTIEN {user_id}',
-        home_page_version: 'v1',
+        home_page_version: 'v2',
         hero_title: 'Source, MXH va MMO trong mot giao dien',
         hero_subtitle: 'Ban demo co san data mau de khach test nhanh tren Vercel.',
         hero_btn_primary_text: 'Xem san pham',

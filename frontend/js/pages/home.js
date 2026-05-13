@@ -97,7 +97,7 @@ window.pageInit = async function(params, query) {
             if (!response.success) return;
 
             const data = response.data || {};
-            const homePageVersion = String(data.home_page_version || 'v1').trim().toLowerCase();
+            const homePageVersion = String(data.home_page_version || 'v2').trim().toLowerCase();
             if (homePageVersion === 'v2') {
                 await renderV2HomeContent();
                 return;
@@ -105,7 +105,7 @@ window.pageInit = async function(params, query) {
 
             applyHeroSettings(data);
         } catch (error) {
-            // ignore
+            await renderV2HomeContent();
         }
     }
 
