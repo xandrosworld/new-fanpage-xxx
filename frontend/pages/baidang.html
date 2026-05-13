@@ -1,0 +1,68 @@
+<div class="container post-page">
+    <div class="post-page-hero">
+        <div>
+            <div class="post-page-kicker">
+                <i class="fas fa-pen-nib"></i>
+                Cộng đồng Sang dev
+            </div>
+            <h1 class="page-title">Đăng bài</h1>
+            <p class="section-subtitle">Chia sẻ cập nhật, kèo dịch vụ, feedback hoặc bài viết ngắn cho cộng đồng.</p>
+        </div>
+        <a href="/feed" data-link class="btn-outline post-feed-link">
+            <i class="fas fa-list"></i>
+            Xem feed
+        </a>
+    </div>
+
+    <div class="post-compose-card">
+        <form id="post-form" class="post-compose-form">
+            <div class="post-compose-main">
+                <label for="post-content" class="post-compose-label">Nội dung bài viết</label>
+                <textarea id="post-content" name="content" rows="5" required placeholder="Hôm nay bạn muốn chia sẻ gì?"></textarea>
+            </div>
+
+            <div class="post-compose-tools">
+                <div class="post-compose-tool">
+                    <label>Ảnh đính kèm</label>
+                    <div class="file-picker post-file-picker">
+                        <input type="file" id="post-media" class="file-input" multiple accept="image/*">
+                        <button type="button" class="btn-outline file-btn" data-file-target="post-media" data-file-label="post-media-label">
+                            <i class="fas fa-image"></i>
+                            Chọn ảnh
+                        </button>
+                        <span id="post-media-label" class="file-label">Chưa chọn file</span>
+                    </div>
+                </div>
+
+                <div class="post-compose-tool">
+                    <label>Link ảnh / video</label>
+                    <input type="text" name="media_url" placeholder="https://...">
+                </div>
+            </div>
+
+            <div id="post-upload-previews" class="upload-preview grid post-upload-previews"></div>
+
+            <div class="post-compose-bottom">
+                <div class="chat-human-check">
+                    <div id="post-create-recaptcha" class="recaptcha-slot is-hidden"></div>
+                    <p id="post-create-recaptcha-status" class="captcha-gate-status"></p>
+                    <button type="button" id="post-create-recaptcha-retry" class="btn-outline" hidden>Tải lại xác thực</button>
+                </div>
+                <button type="submit" class="btn-primary post-submit-btn">
+                    <i class="fas fa-paper-plane"></i>
+                    Đăng bài
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <section class="post-list-section">
+        <div class="section-header">
+            <div>
+                <h3 class="section-title">Bài đăng gần đây</h3>
+                <p class="section-subtitle">Các cập nhật mới nhất từ thành viên.</p>
+            </div>
+        </div>
+        <div id="post-list" class="post-list"></div>
+    </section>
+</div>
