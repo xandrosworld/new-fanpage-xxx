@@ -24,7 +24,6 @@ window.pageInit = async function(params, query) {
     await loadUsers();
     bindEvents();
     initHomeBannerToggle();
-    initSidebarStateObserver();
 
     if (currentSection === 'source') {
         focusSourceSection();
@@ -58,17 +57,25 @@ window.pageInit = async function(params, query) {
             const response = await api.get('/categories');
             const categories = response.data || [];
 
-            categoriesGrid.innerHTML = categories.map(cat => `
-                <div class="category-card" data-category="${cat.id}">
-                    ${renderCategoryIcon(cat.icon)}
-                    <h3>${cat.name}</h3>
-                </div>
-            `).join('');
+            categoriesGrid.innerHTML = [
+                `
+                    <button class="category-card ${currentCategory ? '' : 'active'}" type="button" data-category="">
+                        <i class="fas fa-layer-group"></i>
+                        <h3>Tất cả</h3>
+                    </button>
+                `,
+                ...categories.map(cat => `
+                    <button class="category-card ${String(currentCategory || '') === String(cat.id) ? 'active' : ''}" type="button" data-category="${cat.id}">
+                        ${renderCategoryIcon(cat.icon)}
+                        <h3>${cat.name}</h3>
+                    </button>
+                `)
+            ].join('');
 
             categoriesGrid.querySelectorAll('.category-card').forEach(card => {
                 card.addEventListener('click', () => {
                     const categoryId = card.dataset.category;
-                    currentCategory = categoryId;
+                    currentCategory = categoryId || null;
                     currentPage = 1;
                     syncUrl();
                 });
@@ -97,15 +104,9 @@ window.pageInit = async function(params, query) {
             if (!response.success) return;
 
             const data = response.data || {};
-            const homePageVersion = String(data.home_page_version || 'v2').trim().toLowerCase();
-            if (homePageVersion === 'v2') {
-                await renderV2HomeContent();
-                return;
-            }
-
             applyHeroSettings(data);
         } catch (error) {
-            await renderV2HomeContent();
+            applyHeroSettings({});
         }
     }
 

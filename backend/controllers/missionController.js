@@ -66,6 +66,12 @@ class MissionController {
                 [userId, today]
             );
 
+            if (Number(existing[0]?.is_used || 0) === 1) {
+                const error = new Error('Hôm nay bạn đã hoàn thành nhiệm vụ rồi.');
+                error.statusCode = 400;
+                throw error;
+            }
+
             let key = existing[0]?.key_string;
             if (!key) {
                 key = crypto.randomBytes(18).toString('hex');
@@ -79,16 +85,20 @@ class MissionController {
             const publicBaseUrl = resolvePublicBaseUrl(buildPublicContext(req));
             const destinationUrl = new URL(`/vuot-link.html?token=${encodeURIComponent(key)}`, `${publicBaseUrl || process.env.APP_URL || 'http://localhost:3000'}/`).toString();
 
-            let shortLink = destinationUrl;
-            let provider = 'direct';
-            let shortLinkError = '';
+            let shortLink = '';
+            let provider = 'link4m';
 
             try {
                 const shortResult = await shortenWithLink4m(destinationUrl);
                 shortLink = shortResult.shortUrl || destinationUrl;
                 provider = shortResult.provider || 'link4m';
+                if (!shortLink || shortLink === destinationUrl) {
+                    throw new Error('Link4m chưa trả link rút gọn hợp lệ.');
+                }
             } catch (error) {
-                shortLinkError = error.message || 'Khong the tao link Link4m';
+                const linkError = new Error(error.message || 'Không thể tạo link Link4m. Vui lòng thử lại sau.');
+                linkError.statusCode = 502;
+                throw linkError;
             }
 
             res.json({
@@ -96,15 +106,13 @@ class MissionController {
                 data: {
                     link: shortLink,
                     shortLink,
-                    directLink: destinationUrl,
                     provider,
-                    shortLinkError,
                     completedToday: Boolean(existing[0]?.is_used),
-                    message: 'Vuot link de lay key doc quyen. Key chi dung duoc 1 lan.'
+                    message: 'Vượt Link4m để lấy key độc quyền. Key chỉ dùng được 1 lần trong ngày.'
                 }
             });
         } catch (error) {
-            res.status(500).json({ success: false, message: error.message });
+            res.status(error.statusCode || 500).json({ success: false, message: error.message });
         }
     }
 

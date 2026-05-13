@@ -113,6 +113,17 @@ function getLink4mEndpoints() {
     return Array.from(new Set(candidates.map(item => item.trim()).filter(Boolean)));
 }
 
+function isDemoModeEnabled() {
+    return ['1', 'true', 'yes', 'on'].includes(String(process.env.DEMO_MODE || '').trim().toLowerCase());
+}
+
+function buildDemoLink4mUrl(destinationUrl) {
+    const destination = new URL(destinationUrl);
+    const demoUrl = new URL('/link4m-demo.html', destination.origin);
+    demoUrl.searchParams.set('to', destination.toString());
+    return demoUrl.toString();
+}
+
 async function requestShortUrl(endpoint, apiKey, destinationUrl) {
     const apiUrl = new URL(endpoint);
     apiUrl.searchParams.set('api', apiKey);
@@ -169,6 +180,15 @@ async function requestShortUrl(endpoint, apiKey, destinationUrl) {
 async function shortenWithLink4m(destinationUrl) {
     const apiKey = normalizeText(process.env.LINK4M_API_KEY);
     if (!apiKey) {
+        if (isDemoModeEnabled()) {
+            return {
+                provider: 'link4m-demo',
+                endpoint: 'demo',
+                shortUrl: buildDemoLink4mUrl(destinationUrl),
+                payload: { demo: true }
+            };
+        }
+
         throw new Error('Link4m API key is not configured');
     }
 

@@ -3,72 +3,123 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Lấy key nhiệm vụ</title>
+    <title>Lấy key nhiệm vụ</title>
     <style>
+        * { box-sizing: border-box; }
         body {
-            font-family: Arial, sans-serif;
             margin: 0;
             min-height: 100vh;
             display: grid;
             place-items: center;
-            background: #f5f7fb;
+            padding: 24px;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f8fafc, #ecfeff);
             color: #111827;
         }
         main {
-            width: min(520px, calc(100% - 32px));
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 24px;
-            box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+            width: min(560px, 100%);
+            display: grid;
+            gap: 18px;
+            padding: 28px;
+            border-radius: 10px;
+            border: 1px solid #dbe4ee;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.1);
         }
-        h1 { margin: 0 0 8px; font-size: 24px; }
-        p { color: #4b5563; line-height: 1.5; }
+        .eyebrow {
+            color: #0f766e;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        h1 {
+            margin: 0;
+            font-size: 30px;
+            line-height: 1.15;
+        }
+        p {
+            margin: 0;
+            color: #475569;
+            line-height: 1.65;
+        }
         code {
             display: block;
+            width: 100%;
+            min-height: 72px;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #0f172a;
+            background: #0f172a;
+            color: #f8fafc;
             word-break: break-all;
-            background: #111827;
-            color: #fff;
-            padding: 14px;
-            border-radius: 6px;
-            margin: 16px 0;
+            line-height: 1.6;
         }
-        button, a {
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        button,
+        a {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-height: 40px;
-            padding: 0 14px;
-            border-radius: 6px;
-            text-decoration: none;
-            border: 1px solid #d1d5db;
+            min-height: 44px;
+            padding: 0 16px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
             background: #fff;
             color: #111827;
             cursor: pointer;
+            text-decoration: none;
+            font: inherit;
+            font-weight: 700;
         }
         .primary {
-            background: #2563eb;
+            background: #0ea5a4;
             color: #fff;
-            border-color: #2563eb;
+            border-color: #0ea5a4;
+        }
+        .status {
+            min-height: 20px;
+            color: #0f766e;
+            font-size: 14px;
+            font-weight: 700;
         }
     </style>
 </head>
 <body>
     <main>
-        <h1>Key nhiem vu</h1>
-        <p>Key nay doc quyen cho tai khoan da tao link va chi nhan thuong duoc mot lan trong ngay.</p>
-        <code id="key-output">Dang tai...</code>
-        <button class="primary" id="copy-btn" type="button">Copy key</button>
-        <a href="/nhiemvu">Quay lai nhiem vu</a>
+        <div class="eyebrow">Key nhiệm vụ Link4m</div>
+        <h1>Key của bạn đã sẵn sàng</h1>
+        <p>Copy key này, quay lại trang nhiệm vụ và dán vào ô nhận thưởng. Key chỉ dùng được một lần trong ngày.</p>
+        <code id="key-output">Đang tải...</code>
+        <div class="actions">
+            <button class="primary" id="copy-btn" type="button">Copy key</button>
+            <a href="/nhiemvu">Quay lại nhiệm vụ</a>
+        </div>
+        <div id="copy-status" class="status"></div>
     </main>
+
     <script>
         const params = new URLSearchParams(window.location.search);
         const token = params.get('token') || '';
         const output = document.getElementById('key-output');
-        output.textContent = token || 'Khong co key.';
+        const status = document.getElementById('copy-status');
+        output.textContent = token || 'Không có key.';
+
         document.getElementById('copy-btn').addEventListener('click', async () => {
-            if (!token) return;
-            await navigator.clipboard.writeText(token);
+            if (!token) {
+                status.textContent = 'Không có key để copy.';
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(token);
+                status.textContent = 'Đã copy key.';
+            } catch (_) {
+                status.textContent = 'Không thể copy tự động, hãy bôi đen key và copy thủ công.';
+            }
         });
     </script>
 </body>

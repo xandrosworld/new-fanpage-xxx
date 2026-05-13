@@ -21,8 +21,7 @@
             try {
                 const storageKey = 'site-theme-mode';
                 const saved = localStorage.getItem(storageKey);
-                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                const theme = saved === 'light' || saved === 'dark' ? saved : (prefersDark ? 'dark' : 'light');
+                const theme = saved === 'light' || saved === 'dark' ? saved : 'light';
                 document.documentElement.dataset.theme = theme;
                 document.documentElement.style.colorScheme = theme;
             } catch (_) {

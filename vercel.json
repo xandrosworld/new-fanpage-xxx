@@ -44,7 +44,7 @@
       ]
     },
     {
-      "source": "/(blocked-ip|human-check)\\.html",
+      "source": "/(blocked-ip|human-check|vuot-link|link4m-demo)\\.html",
       "headers": [
         {
           "key": "Cache-Control",
@@ -98,6 +98,14 @@
     {
       "src": "/human-check.html",
       "dest": "/frontend/human-check.html"
+    },
+    {
+      "src": "/vuot-link.html",
+      "dest": "/frontend/vuot-link.html"
+    },
+    {
+      "src": "/link4m-demo.html",
+      "dest": "/frontend/link4m-demo.html"
     },
     {
       "src": "/index.html",

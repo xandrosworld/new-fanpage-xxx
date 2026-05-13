@@ -15,33 +15,14 @@ window.pageInit = async function() {
         const withdraws = Array.isArray(data.withdraws) ? data.withdraws : [];
         const txs = Array.isArray(data.recentTransactions) ? data.recentTransactions : [];
 
-        summaryEl.innerHTML = `
-            <div class="income-stat-card is-primary">
-                <span class="income-stat-label">Số dư hiện tại</span>
-                <strong>${formatMoney(data.balance || 0)}</strong>
-            </div>
-            <div class="income-stat-card">
-                <span class="income-stat-label">Doanh thu bán hàng</span>
-                <strong>${formatMoney(summary.sales_income || 0)}</strong>
-            </div>
-            <div class="income-stat-card">
-                <span class="income-stat-label">Tiền nhiệm vụ</span>
-                <strong>${formatMoney(summary.mission_income || 0)}</strong>
-            </div>
-            <div class="income-stat-card">
-                <span class="income-stat-label">Đang chờ rút</span>
-                <strong>${formatMoney(summary.withdrawn_pending || 0)}</strong>
-            </div>
-            <div class="income-stat-card">
-                <span class="income-stat-label">Tổng tiền vào</span>
-                <strong>${formatMoney(summary.total_in || 0)}</strong>
-            </div>
-            <div class="income-stat-card">
-                <span class="income-stat-label">Nhiệm vụ hôm nay</span>
-                <strong>${mission.completed ? 'Đã hoàn thành' : 'Chưa hoàn thành'}</strong>
-                ${mission.usedAt ? `<small>${formatDateShort(mission.usedAt)}</small>` : ''}
-            </div>
-        `;
+        summaryEl.innerHTML = [
+            renderStatCard('Số dư hiện tại', formatMoney(data.balance || 0), 'fas fa-wallet', true, 'Có thể rút khi đủ điều kiện'),
+            renderStatCard('Doanh thu bán hàng', formatMoney(summary.sales_income || 0), 'fas fa-chart-line', false, 'Tổng tiền từ sản phẩm'),
+            renderStatCard('Tiền nhiệm vụ', formatMoney(summary.mission_income || 0), 'fas fa-key', false, 'Thu nhập từ vượt link'),
+            renderStatCard('Đang chờ rút', formatMoney(summary.withdrawn_pending || 0), 'fas fa-clock', false, 'Các lệnh chưa xử lý'),
+            renderStatCard('Tổng tiền vào', formatMoney(summary.total_in || 0), 'fas fa-arrow-trend-up', false, 'Bao gồm nạp và doanh thu'),
+            renderStatCard('Nhiệm vụ hôm nay', mission.completed ? 'Đã hoàn thành' : 'Chưa hoàn thành', 'fas fa-list-check', false, mission.usedAt ? formatDateShort(mission.usedAt) : 'Chưa có lượt nhận')
+        ].join('');
 
         renderProducts(products);
         renderWithdraws(withdraws);
@@ -121,6 +102,19 @@ window.pageInit = async function() {
                     <button class="btn-danger" data-delete="${product.id}">Xóa</button>
                 </div>
             </article>
+        `;
+    }
+
+    function renderStatCard(label, value, icon, isPrimary = false, hint = '') {
+        return `
+            <div class="income-stat-card ${isPrimary ? 'is-primary' : ''}">
+                <div class="income-stat-top">
+                    <span class="income-stat-icon"><i class="${icon}"></i></span>
+                    <span class="income-stat-label">${escapeHtml(label)}</span>
+                </div>
+                <strong>${escapeHtml(value)}</strong>
+                ${hint ? `<small>${escapeHtml(hint)}</small>` : ''}
+            </div>
         `;
     }
 

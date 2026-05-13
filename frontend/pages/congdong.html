@@ -3,9 +3,9 @@
         <aside class="msgr-sidebar">
             <div class="msgr-side-head">
                 <div class="msgr-brand">
-                    <div class="msgr-avatar">C</div>
+                    <div class="msgr-avatar"><i class="fas fa-comments"></i></div>
                     <div>
-                        <div class="msgr-title">Cong dong</div>
+                        <div class="msgr-title">Cộng đồng</div>
                         <div class="msgr-subtitle">Sang dev</div>
                     </div>
                 </div>
@@ -13,17 +13,17 @@
             </div>
 
             <div class="msgr-side-section">
-                <div class="msgr-side-label">Phong</div>
+                <div class="msgr-side-label">Phòng</div>
                 <button
                     type="button"
                     class="msgr-thread is-active"
                     data-community-panel-trigger="community"
                     aria-current="true"
                 >
-                    <div class="msgr-thread-avatar">#</div>
+                    <div class="msgr-thread-avatar"><i class="fas fa-hashtag"></i></div>
                     <div class="msgr-thread-body">
-                        <div class="msgr-thread-title">Phong chat chung</div>
-                        <div class="msgr-thread-meta">Tin nhan tu xoa sau 7 ngay</div>
+                        <div class="msgr-thread-title">Phòng chat chung</div>
+                        <div class="msgr-thread-meta">Tin nhắn tự xóa sau 7 ngày</div>
                     </div>
                 </button>
 
@@ -33,10 +33,10 @@
                     data-community-panel-trigger="support"
                     aria-current="false"
                 >
-                    <div class="msgr-thread-avatar">!</div>
+                    <div class="msgr-thread-avatar"><i class="fas fa-headset"></i></div>
                     <div class="msgr-thread-body">
-                        <div class="msgr-thread-title">Ho tro & to cao</div>
-                        <div class="msgr-thread-meta">Chat rieng voi admin</div>
+                        <div class="msgr-thread-title">Hỗ trợ & tố cáo</div>
+                        <div class="msgr-thread-meta">Chat riêng với admin</div>
                     </div>
                 </button>
             </div>
@@ -47,9 +47,13 @@
                 <div class="msgr-chat-title">
                     <div class="msgr-chat-dot"></div>
                     <div>
-                        <strong id="community-panel-title">Phong chat chung</strong>
+                        <strong id="community-panel-title">Phòng chat chung</strong>
                         <div id="community-panel-subtitle" class="msgr-chat-sub">Nhắn tin nhanh, hỗ trợ ảnh và video link</div>
                     </div>
+                </div>
+                <div class="msgr-chat-tools">
+                    <span><i class="fas fa-shield-halved"></i> Kiểm duyệt</span>
+                    <span><i class="fas fa-clock"></i> 7 ngày</span>
                 </div>
             </div>
 
@@ -64,11 +68,11 @@
                             <button
                                 type="button"
                                 class="msgr-icon-btn file-btn"
-                                aria-label="Chon anh"
+                                aria-label="Chọn ảnh"
                                 data-file-target="community-media"
                                 data-file-label="community-media-label"
                             >
-                                <span class="msgr-icon">+</span>
+                                <i class="fas fa-image"></i>
                             </button>
                             <input type="file" id="community-media" class="file-input" accept="image/*">
                             <textarea
@@ -77,12 +81,14 @@
                                 placeholder="Nhập tin nhắn..."
                                 aria-label="Nhập tin nhắn"
                             ></textarea>
-                            <button type="submit" class="msgr-send" aria-label="Gui">Gui</button>
+                            <button type="submit" class="msgr-send" aria-label="Gửi">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
 
                             <div class="chat-human-check">
                                 <div id="community-message-recaptcha" class="recaptcha-slot is-hidden"></div>
                                 <p id="community-message-recaptcha-status" class="captcha-gate-status"></p>
-                                <button type="button" id="community-message-recaptcha-retry" class="btn-outline" hidden>Tai lai xac thuc</button>
+                                <button type="button" id="community-message-recaptcha-retry" class="btn-outline" hidden>Tải lại xác thực</button>
                             </div>
                         </form>
 
@@ -102,22 +108,24 @@
                     <div class="msgr-chat-foot">
                         <form id="support-form" class="chat-input community-support-form">
                             <select name="type" class="chat-select">
-                                <option value="support">Ho tro</option>
-                                <option value="report">To cao</option>
+                                <option value="support">Hỗ trợ</option>
+                                <option value="report">Tố cáo</option>
                             </select>
                             <input type="text" name="content" placeholder="Nhập nội dung cần admin xử lý..." required>
-                            <button type="submit" class="msgr-send">Gui</button>
+                            <button type="submit" class="msgr-send">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
 
                             <div class="chat-human-check">
                                 <div id="support-message-recaptcha" class="recaptcha-slot is-hidden"></div>
                                 <p id="support-message-recaptcha-status" class="captcha-gate-status"></p>
-                                <button type="button" id="support-message-recaptcha-retry" class="btn-outline" hidden>Tai lai xac thuc</button>
+                                <button type="button" id="support-message-recaptcha-retry" class="btn-outline" hidden>Tải lại xác thực</button>
                             </div>
                         </form>
 
                         <div class="msgr-foot-meta">
                             <small class="section-subtitle">
-                                Muc nay gui rieng cho admin. Chon "To cao" neu can bao xau, lua dao hoac noi dung khong phu hop.
+                                Mục này gửi riêng cho admin. Chọn "Tố cáo" nếu cần báo xấu, lừa đảo hoặc nội dung không phù hợp.
                             </small>
                         </div>
                     </div>

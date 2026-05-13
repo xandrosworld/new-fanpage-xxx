@@ -55,7 +55,7 @@ window.pageInit = async function() {
 
     const panelMeta = {
         community: ['Phòng chat chung', 'Nhắn tin nhanh, hỗ trợ ảnh và video link'],
-        support: ['Ho tro & to cao', 'Chat rieng voi admin de nhan ho tro hoac gui to cao']
+        support: ['Hỗ trợ & tố cáo', 'Chat riêng với admin để nhận hỗ trợ hoặc gửi tố cáo']
     };
 
     await loadMessages();
@@ -274,7 +274,7 @@ window.pageInit = async function() {
 
     async function handleClipboardImages(images) {
         if (!images.length) return;
-        if (images.length > 1) showToast('Moi tin nhan chi ho tro 1 anh, se lay anh dau tien', 'warning');
+        if (images.length > 1) showToast('Mỗi tin nhắn chỉ hỗ trợ 1 ảnh, sẽ lấy ảnh đầu tiên', 'warning');
 
         fileInput.value = '';
         const attachment = createAttachment(images[0], 'uploaded', 'uploading');
@@ -337,7 +337,7 @@ window.pageInit = async function() {
         if (selectedAttachment.source === 'uploaded') {
             fileLabel.textContent = selectedAttachment.status === 'uploading'
                 ? 'Đang upload ảnh từ clipboard...'
-                : 'Anh tu clipboard';
+                : 'Ảnh từ clipboard';
             return;
         }
         fileLabel.textContent = selectedAttachment.file?.name || 'Chưa chọn file';
@@ -585,7 +585,7 @@ window.pageInit = async function() {
 
             if (submitBtn) {
                 submitBtn.disabled = isSubmitting() || state.status === 'loading' || state.status === 'error';
-                submitBtn.textContent = isSubmitting() ? 'Đang gửi...' : 'Gửi';
+                submitBtn.innerHTML = isSubmitting() ? 'Đang gửi...' : '<i class="fas fa-paper-plane"></i>';
             }
         }
 
@@ -596,7 +596,7 @@ window.pageInit = async function() {
 
             try {
                 const nextState = await window.RecaptchaManager.render(container, { forceReload });
-                if (!nextState.enabled) throw new Error('reCAPTCHA hien chua san sang tren may chu.');
+                if (!nextState.enabled) throw new Error('reCAPTCHA hiện chưa sẵn sàng trên máy chủ.');
                 state = { ...state, ...nextState, status: 'ready', renderError: '' };
             } catch (error) {
                 state = {
@@ -615,7 +615,7 @@ window.pageInit = async function() {
         function getToken() {
             if (!state.required) return '';
             if (state.status === 'loading') {
-                showToast('reCAPTCHA dang tai, vui long doi mot chut', 'warning');
+                showToast('reCAPTCHA đang tải, vui lòng đợi một chút', 'warning');
                 return null;
             }
             if (state.status === 'error') {

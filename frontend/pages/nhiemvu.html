@@ -1,13 +1,18 @@
 <div class="container mission-page mission-hub-page">
     <section class="section-card mission-hub-hero">
         <div class="mission-hub-copy">
-            <span class="mission-hub-eyebrow">Nhiệm vụ 400đ</span>
-            <h1 class="page-title">Nhiệm vụ vượt link</h1>
-            <p class="section-subtitle">Tạo link Link4m, vượt link, copy key ở trang mở ra rồi dán lại tại đây để nhận thưởng nếu key đúng.</p>
+            <span class="mission-hub-eyebrow"><i class="fas fa-key"></i> Nhiệm vụ 400đ</span>
+            <h1 class="page-title">Lấy key qua Link4m</h1>
+            <p class="section-subtitle">Người dùng bấm lấy key, hệ thống tạo link Link4m. Sau khi vượt link, key sẽ hiện ở trang đích để dán lại và nhận thưởng.</p>
+            <div class="mission-step-row">
+                <span>1. Lấy link</span>
+                <span>2. Vượt Link4m</span>
+                <span>3. Dán key</span>
+            </div>
         </div>
         <div class="mission-hub-reward">
             <span>Thưởng hôm nay</span>
-            <strong>400 ₫</strong>
+            <strong id="mission-reward-amount">400đ</strong>
         </div>
     </section>
 
@@ -15,28 +20,39 @@
         <section class="section-card mission-hub-panel">
             <div class="mission-hub-panel-head">
                 <div>
-                    <h3 class="section-title">Tạo link lấy key</h3>
-                    <p class="section-subtitle">Hệ thống sẽ tự gọi Link4m bằng API key để tạo link rút gọn.</p>
+                    <h3 class="section-title">Link lấy key</h3>
+                    <p class="section-subtitle">Bấm một lần để hệ thống tạo link rút gọn bằng Link4m.</p>
                 </div>
-                <button id="mission-generate" class="btn-primary" type="button">Tạo link Link4m</button>
+                <button id="mission-generate" class="btn-primary" type="button">
+                    <i class="fas fa-key"></i>
+                    Lấy key
+                </button>
             </div>
             <div id="mission-status" class="mission-status-banner"></div>
-            <div id="mission-link" class="mission-link-slot"></div>
+            <div id="mission-link" class="mission-link-slot">
+                <div class="mission-link-empty">
+                    <i class="fas fa-link"></i>
+                    <span>Link nhiệm vụ sẽ hiện ở đây sau khi bấm lấy key.</span>
+                </div>
+            </div>
         </section>
 
         <section class="section-card mission-hub-panel mission-claim-panel">
             <div class="mission-hub-panel-head">
                 <div>
                     <h3 class="section-title">Nhập key nhận thưởng</h3>
-                    <p class="section-subtitle">Sau khi vượt link, key sẽ hiện ra ở trang đích để bạn copy và dán lại.</p>
+                    <p class="section-subtitle">Copy key ở trang đích sau khi vượt link rồi dán vào ô bên dưới.</p>
                 </div>
             </div>
             <div class="mission-claim-form">
                 <div class="form-group">
-                    <label for="mission-key">Key độc quyền</label>
-                    <input id="mission-key" type="text" placeholder="Nhập key sau khi vượt link">
+                    <label for="mission-key">Key nhiệm vụ</label>
+                    <input id="mission-key" type="text" placeholder="Dán key Link4m vào đây" autocomplete="off">
                 </div>
-                <button id="mission-claim" class="btn-outline" type="button">Nhận thưởng</button>
+                <button id="mission-claim" class="btn-outline" type="button">
+                    <i class="fas fa-gift"></i>
+                    Nhận thưởng
+                </button>
             </div>
         </section>
     </div>

@@ -8,6 +8,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
 const logService = require('./services/logService');
+const database = require('./config/database');
 const { ipGuard } = require('./middleware/ipGuard');
 const humanGateService = require('./services/humanGateService');
 const recaptchaService = require('./services/recaptchaService');
@@ -261,6 +262,7 @@ app.get('/api/health', (req, res) => {
     res.json({
         success: true,
         message: 'Server is running',
+        mode: database.isDemoDatabase ? 'demo' : 'live',
         timestamp: new Date().toISOString()
     });
 });

@@ -140,69 +140,91 @@ window.pageInit = async function(params, query) {
 
     function renderProduct() {
         const container = document.getElementById('product-content');
+        const updatedAt = product.updated_at || product.created_at;
 
         container.innerHTML = `
-            <div class="product-layout">
-                <!-- Gallery -->
+            <div class="product-layout product-layout-refined">
                 <div class="product-gallery">
                     <div class="main-image-container">
-                        <img src="${getProductImageUrl(product)}" 
+                        <img src="${getProductImageUrl(product)}"
                              onerror="${getProductImageErrorHandler()}"
-                             alt="${escapeHtml(product.title)}" 
-                             class="main-image" 
+                             alt="${escapeHtml(product.title)}"
+                             class="main-image"
                              id="main-image">
                     </div>
-                    <div class="gallery-thumbs" id="gallery-thumbs">
-                        <!-- Thumbnails will be inserted here -->
-                    </div>
+                    <div class="gallery-thumbs" id="gallery-thumbs"></div>
                 </div>
 
-                <!-- Info -->
-                <div class="product-info-section">
+                <aside class="product-info-section product-buy-panel">
                     <div class="product-header">
+                        <span class="product-detail-kicker">${escapeHtml(product.category_name || 'Sản phẩm')}</span>
                         <h1>${escapeHtml(product.title)}</h1>
-                        <div class="product-meta">
-                            <span><i class="fas fa-eye"></i> ${product.view_count} lượt xem</span>
-                            <span><i class="fas fa-shopping-cart"></i> ${product.purchase_count} lượt mua</span>
-                            <span><i class="fas fa-star"></i> ${(Number(product.avg_rating || 0)).toFixed(1)} (${Number(product.review_count || 0)} đánh giá)</span>
-                            <span><i class="fas fa-clock"></i> ${formatDateShort(product.created_at)}</span>
+                    </div>
+
+                    <div class="product-facts">
+                        <div>
+                            <span>Giá bán</span>
+                            ${renderProductInlinePrice(product)}
+                        </div>
+                        <div>
+                            <span>Danh mục</span>
+                            <strong>${escapeHtml(product.category_name || 'Chưa phân loại')}</strong>
+                        </div>
+                        <div>
+                            <span>Cập nhật</span>
+                            <strong>${updatedAt ? formatDateShort(updatedAt) : 'Mới nhất'}</strong>
                         </div>
                     </div>
 
+                    <div class="product-micro-stats" aria-label="Thống kê sản phẩm">
+                        <span><i class="fas fa-eye"></i> ${Number(product.view_count || 0)} lượt xem</span>
+                        <span><i class="fas fa-shopping-cart"></i> ${Number(product.purchase_count || 0)} lượt mua</span>
+                        <span><i class="fas fa-star"></i> ${(Number(product.avg_rating || 0)).toFixed(1)} (${Number(product.review_count || 0)})</span>
+                    </div>
+
                     <div class="product-price-box">
-                        ${renderProductDetailPrice(product)}
                         <div class="purchase-section">
                             ${renderPurchaseButtons()}
                         </div>
                     </div>
 
                     ${renderSellerInfo()}
-                </div>
+                </aside>
             </div>
 
-            <!-- Tabs -->
-            <div class="product-tabs">
-                <div class="tab-buttons">
-                    <button class="tab-btn active" data-tab="description">Mô tả</button>
-                    <button class="tab-btn" data-tab="video">Video demo</button>
-                    <button class="tab-btn" data-tab="reviews">Đánh giá</button>
-                </div>
-            </div>
-
-            <div class="tab-content">
-                <div id="tab-description" class="tab-pane active">
-                    <div class="description-content">
-                        ${formatPlainTextHtml(product.content || product.description || 'Chưa có mô tả chi tiết')}
+            <section class="product-detail-block" aria-label="Chi tiết sản phẩm">
+                <div class="product-detail-block-head">
+                    <div>
+                        <span class="product-detail-kicker">Chi tiết</span>
+                        <h2>${escapeHtml(product.title)}</h2>
                     </div>
-                    ${renderAiAssistant()}
+                    ${product.demo_url ? `
+                        <a href="${escapeHtml(product.demo_url)}" target="_blank" rel="noopener noreferrer" class="btn btn-demo">
+                            <i class="fas fa-eye"></i> Xem demo
+                        </a>
+                    ` : ''}
                 </div>
-                <div id="tab-video" class="tab-pane">
-                    ${renderVideo()}
+                <div class="description-content product-description-box">
+                    ${formatPlainTextHtml(product.content || product.description || 'Chưa có mô tả chi tiết')}
                 </div>
-                <div id="tab-reviews" class="tab-pane">
-                    ${renderReviews()}
+                ${product.video_url ? `
+                    <div class="product-video-block">
+                        <h3>Video demo</h3>
+                        ${renderVideo()}
+                    </div>
+                ` : ''}
+                ${renderAiAssistant()}
+            </section>
+
+            <section id="product-reviews-panel" class="product-reviews-panel" aria-label="Đánh giá sản phẩm">
+                <div class="product-detail-block-head">
+                    <div>
+                        <span class="product-detail-kicker">Đánh giá</span>
+                        <h2>Phản hồi người mua</h2>
+                    </div>
                 </div>
-            </div>
+                ${renderReviews()}
+            </section>
         `;
 
         bindEvents();
@@ -318,6 +340,23 @@ window.pageInit = async function(params, query) {
         `;
     }
 
+    function renderProductInlinePrice(productInput = {}) {
+        const effectivePrice = getEffectiveProductPrice(productInput);
+        const originalPrice = getOriginalProductPrice(productInput);
+        const salePercent = Number(productInput.sale_percent || 0);
+        const hasSale = salePercent > 0 && effectivePrice < originalPrice;
+
+        return `
+            <strong class="product-fact-price">${formatMoney(effectivePrice)}</strong>
+            ${hasSale ? `
+                <span class="product-fact-sale">
+                    <span>${formatMoney(originalPrice)}</span>
+                    <em>-${Math.round(salePercent)}%</em>
+                </span>
+            ` : ''}
+        `;
+    }
+
     function renderPurchaseButtons() {
         const user = Auth.getCurrentUser();
         const canEdit = user && (user.is_primary_admin === true || Number(user.id) === Number(product.seller_id));
@@ -347,7 +386,7 @@ window.pageInit = async function(params, query) {
         return `
             <div class="purchase-actions">
                 <button class="btn btn-buy" id="product-purchase-btn" onclick="purchaseProduct()">
-                    <i class="fas fa-shopping-cart"></i> Mua ngay
+                    <i class="fas fa-credit-card"></i> Thanh toán
                 </button>
                 ${product.demo_url ? `
                     <a href="${product.demo_url}" target="_blank" class="btn btn-demo">
@@ -522,13 +561,13 @@ window.pageInit = async function(params, query) {
         return `
             <div class="ai-assistant-box">
                 <div class="ai-assistant-head">
-                    <h3>Tro ly AI phẩm</h3>
-                    <p>Hoi nhanh ve tinh nang, doi tuong phu hop, cach su dung.</p>
+                    <h3>Trợ lý AI sản phẩm</h3>
+                    <p>Hỏi nhanh về tính năng, đối tượng phù hợp và cách sử dụng.</p>
                 </div>
                 <div class="ai-assistant-form">
                     <textarea id="ai-question" rows="3" placeholder="Ví dụ: Sản phẩm này phù hợp với người mới không?"></textarea>
                     <button class="btn btn-buy" id="ai-ask-btn" type="button">
-                        <i class="fas fa-robot"></i> Hoi AI
+                        <i class="fas fa-robot"></i> Hỏi AI
                     </button>
                 </div>
                 <div class="ai-assistant-result" id="ai-assistant-result" style="display:none;">
@@ -643,10 +682,7 @@ window.pageInit = async function(params, query) {
                     product.review_count = Number(reviewsData.review_count || product.review_count || 0);
                     product.my_review = reviewsData.my_review || product.my_review || null;
                     renderProduct();
-                    setTimeout(() => {
-                        const reviewTabBtn = document.querySelector('[data-tab="reviews"]');
-                        if (reviewTabBtn) reviewTabBtn.click();
-                    }, 0);
+                    setTimeout(scrollReviewsIntoView, 0);
                 }
             } catch (error) {
                 showToast(error.message || 'Không thể gửi đánh giá', 'error');
@@ -672,10 +708,7 @@ window.pageInit = async function(params, query) {
                         product.review_count = Number(reviewsData.review_count || 0);
                         product.my_review = reviewsData.my_review || null;
                         renderProduct();
-                        setTimeout(() => {
-                            const reviewTabBtn = document.querySelector('[data-tab="reviews"]');
-                            if (reviewTabBtn) reviewTabBtn.click();
-                        }, 0);
+                        setTimeout(scrollReviewsIntoView, 0);
                     }
                 } catch (error) {
                     showToast(error.message || 'Không thể xóa đánh giá', 'error');
@@ -730,9 +763,16 @@ window.pageInit = async function(params, query) {
                 showToast(error.message || 'Không thể sử dụng trợ lý AI lúc này', 'warning');
             } finally {
                 askBtn.disabled = false;
-                askBtn.innerHTML = '<i class="fas fa-robot"></i> Hoi AI';
+                askBtn.innerHTML = '<i class="fas fa-robot"></i> Hỏi AI';
             }
         });
+    }
+
+    function scrollReviewsIntoView() {
+        const reviewsPanel = document.getElementById('product-reviews-panel');
+        if (reviewsPanel) {
+            reviewsPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     }
 
     function renderAiRichText(input) {

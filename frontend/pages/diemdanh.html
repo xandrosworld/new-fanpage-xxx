@@ -1,4 +1,27 @@
 <div class="container reward-page reward-checkin-page">
+    <section class="section-card checkin-hero-shell">
+        <div class="checkin-hero-copy">
+            <span class="checkin-eyebrow"><i class="fas fa-calendar-check"></i> Điểm danh</span>
+            <h1 id="checkin-page-title" class="page-title">Điểm danh hôm nay</h1>
+            <p id="checkin-page-subtitle" class="section-subtitle">Nhận thưởng mỗi ngày, giữ streak để không bị reset mốc quà tuần.</p>
+            <div class="checkin-hero-badges badge-row">
+                <span class="badge badge-info">Tự cộng ví</span>
+                <span class="badge badge-success">Mỗi ngày 1 lượt</span>
+            </div>
+        </div>
+        <div class="checkin-hero-panel">
+            <div class="checkin-hero-meter">
+                <span>Streak</span>
+                <strong id="checkin-hero-streak">0</strong>
+                <small>ngày</small>
+            </div>
+            <div class="checkin-hero-note">
+                <div class="checkin-hero-note-label">Mốc tiếp theo</div>
+                <p id="checkin-hero-note">Đang tải phần thưởng hôm nay...</p>
+            </div>
+        </div>
+    </section>
+
     <div class="reward-layout">
         <section class="reward-main">
             <div class="section-card checkin-highlight-card">
@@ -28,15 +51,30 @@
                     </div>
 
                     <div class="checkin-actions">
-                        <button id="checkin-claim-btn" class="btn-primary">Điểm danh hôm nay</button>
+                        <button id="checkin-claim-btn" class="btn-primary" type="button">
+                            <i class="fas fa-gift"></i>
+                            Điểm danh hôm nay
+                        </button>
                     </div>
                 </div>
+            </div>
+
+            <div class="section-card checkin-progress-card">
+                <div class="section-header">
+                    <div>
+                        <h3 class="section-title">Mốc thưởng 7 ngày</h3>
+                        <p class="section-subtitle">Mốc hiện tại được tô nổi để người dùng biết hôm nay nhận bao nhiêu.</p>
+                    </div>
+                    <span id="checkin-progress-badge" class="badge badge-info">Đang tải</span>
+                </div>
+                <div id="checkin-progress" class="checkin-progress-showcase"></div>
             </div>
 
             <div class="section-card checkin-history-card">
                 <div class="section-header">
                     <div>
                         <h3 class="section-title">Lịch sử điểm danh</h3>
+                        <p class="section-subtitle">Các lượt nhận thưởng gần nhất.</p>
                     </div>
                 </div>
                 <div id="checkin-history" class="reward-history"></div>

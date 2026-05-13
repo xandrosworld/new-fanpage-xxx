@@ -1,104 +1,85 @@
-﻿<div class="home-page">
+<div class="home-page home-market-page">
     <div class="container">
-        <div id="home-banner-shell" class="home-banner-shell">
-            <button id="home-banner-toggle" class="home-banner-toggle" type="button" aria-expanded="true" aria-label="Đóng banner" title="Đóng banner">
-                <i id="home-banner-toggle-icon" class="fas fa-xmark"></i>
-            </button>
-            <div id="home-content-version-slot" class="home-content-version-slot">
-                <section class="hero hero-services">
-                    <div class="hero-copy">
-                        <div class="hero-kicker">
-                            <i class="fas fa-bolt"></i>
-                            Source code · MXH · MMO
-                        </div>
-                        <h1 id="hero-title">Sang dev - dịch vụ số cho seller MMO</h1>
-                        <p id="hero-subtitle">Mua bán source code, tài khoản mạng xã hội và dịch vụ MMO với quy trình rõ ràng, nạp tiền nhanh, giao dịch minh bạch.</p>
-                        <div class="hero-actions">
-                            <a href="/mxh" id="hero-btn-primary" data-link class="btn-primary">Xem dịch vụ MXH</a>
-                            <a href="/dangban" id="hero-btn-secondary" data-link class="btn-outline">Đăng bán source</a>
-                        </div>
-                    </div>
-                    <div class="hero-card hero-service-card">
-                        <h3 class="section-title" id="hero-card-title">Dịch vụ đang mở bán</h3>
-                        <p class="section-subtitle" id="hero-card-subtitle">Gom các nhu cầu phổ biến của seller MMO vào một nơi dễ mua, dễ quản lý.</p>
-                        <div class="hero-service-grid">
-                            <a href="/?section=source" data-link class="hero-service-item">
-                                <i class="fas fa-code"></i>
-                                <span>Source code</span>
-                            </a>
-                            <a href="/mxh" data-link class="hero-service-item">
-                                <i class="fas fa-share-nodes"></i>
-                                <span>Tài khoản MXH</span>
-                            </a>
-                            <a href="/naptien" data-link class="hero-service-item">
-                                <i class="fas fa-rocket"></i>
-                                <span>Dịch vụ MMO</span>
-                            </a>
-                        </div>
-                        <div class="badge-row section-spaced" id="hero-badges">
-                            <div class="badge badge-info">Giao dịch rõ ràng</div>
-                            <div class="badge badge-success">Bảo mật tài khoản</div>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </div>
-
-        <section class="home-service-overview" aria-label="Dịch vụ nổi bật">
-            <div class="home-section-heading">
-                <div>
-                    <span class="home-section-kicker">Dịch vụ đang triển khai</span>
-                    <h2>Source, tài khoản MXH và MMO được tách rõ để khách dễ chọn</h2>
+        <section class="home-market-hero" aria-label="Trang chủ">
+            <div class="home-market-copy">
+                <div class="home-market-kicker">
+                    <i class="fas fa-bolt"></i>
+                    Source code · MXH · MMO
                 </div>
-                <a href="/mxh" data-link class="home-section-link">
-                    Xem dịch vụ MXH <i class="fas fa-arrow-right"></i>
-                </a>
+                <h1 id="hero-title">Sang dev - chợ dịch vụ số cho seller MMO</h1>
+                <p id="hero-subtitle">Mua source, tài khoản mạng xã hội và tool MMO trong một giao diện gọn, rõ giá, dễ thanh toán và dễ quản lý sau khi mua.</p>
+                <div class="hero-actions">
+                    <a href="/?section=source" id="hero-btn-primary" data-link class="btn-primary">
+                        <i class="fas fa-code"></i>
+                        Xem source
+                    </a>
+                    <a href="/mxh" id="hero-btn-secondary" data-link class="btn-outline">
+                        <i class="fas fa-share-nodes"></i>
+                        Dịch vụ MXH
+                    </a>
+                </div>
             </div>
-            <div class="home-service-lanes">
-                <a href="/?section=source" data-link class="home-service-lane">
-                    <i class="fas fa-code"></i>
-                    <div>
-                        <strong>Source code</strong>
-                        <span>Website, tool, template và sản phẩm số có thể đăng bán trực tiếp.</span>
-                    </div>
+
+            <div class="home-market-panel" aria-label="Lối tắt nhanh">
+                <a href="/nhiemvu" data-link>
+                    <span><i class="fas fa-key"></i> Lấy key nhiệm vụ</span>
+                    <strong>400đ</strong>
                 </a>
-                <a href="/mxh" data-link class="home-service-lane">
-                    <i class="fas fa-share-nodes"></i>
-                    <div>
-                        <strong>Tài khoản MXH</strong>
-                        <span>Fanpage, TikTok, Instagram, YouTube và các loại tài khoản theo nền tảng.</span>
-                    </div>
+                <a href="/diemdanh" data-link>
+                    <span><i class="fas fa-calendar-check"></i> Điểm danh</span>
+                    <strong>Mỗi ngày</strong>
                 </a>
-                <a href="/baidang" data-link class="home-service-lane">
-                    <i class="fas fa-rocket"></i>
-                    <div>
-                        <strong>MMO & bài đăng</strong>
-                        <span>Khu vực cập nhật kèo, nội dung cộng đồng và nhu cầu MMO mới.</span>
-                    </div>
+                <a href="/seller-dashboard" data-link>
+                    <span><i class="fas fa-chart-line"></i> Dashboard</span>
+                    <strong>Theo dõi tiền</strong>
                 </a>
             </div>
         </section>
 
-        <!-- Categories -->
-        <div class="categories-section">
-            <h2>Danh mục sản phẩm</h2>
+        <nav class="home-quick-strip" aria-label="Điều hướng nhanh">
+            <a href="/?section=source" data-link>
+                <i class="fas fa-code"></i>
+                <span>Source code</span>
+            </a>
+            <a href="/mxh" data-link>
+                <i class="fas fa-share-nodes"></i>
+                <span>Tài khoản MXH</span>
+            </a>
+            <a href="/congdong" data-link>
+                <i class="fas fa-comments"></i>
+                <span>Cộng đồng</span>
+            </a>
+            <a href="/naptien" data-link>
+                <i class="fas fa-wallet"></i>
+                <span>Nạp tiền</span>
+            </a>
+        </nav>
+
+        <section class="categories-section home-compact-section">
+            <div class="home-section-heading">
+                <div>
+                    <span class="home-section-kicker">Danh mục</span>
+                    <h2>Chọn nhanh loại sản phẩm</h2>
+                </div>
+            </div>
             <div id="categories-list" class="categories-grid">
                 <!-- Categories sẽ được load bằng JS -->
             </div>
-        </div>
+        </section>
 
-        <!-- Users -->
-        <div id="users-section" class="users-section" style="display: none;">
+        <section id="users-section" class="users-section home-compact-section" style="display: none;">
             <div class="section-header">
                 <h2>Tài khoản phù hợp</h2>
             </div>
             <div id="users-grid" class="users-grid"></div>
-        </div>
+        </section>
 
-        <!-- Products -->
-        <div class="products-section">
+        <section class="products-section home-compact-section">
             <div class="section-header">
-                <h2>Sản phẩm mới nhất</h2>
+                <div>
+                    <span class="home-section-kicker">Marketplace</span>
+                    <h2>Sản phẩm mới nhất</h2>
+                </div>
                 <div class="filter-controls">
                     <select id="sort-select">
                         <option value="newest">Mới nhất</option>
@@ -113,10 +94,9 @@
                 <!-- Products sẽ được load bằng JS -->
             </div>
 
-            <!-- Pagination -->
             <div id="pagination" class="pagination">
                 <!-- Pagination sẽ được load bằng JS -->
             </div>
-        </div>
+        </section>
     </div>
 </div>

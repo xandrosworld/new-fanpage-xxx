@@ -514,6 +514,104 @@ const DemoApiFallback = (() => {
         };
     }
 
+    function withdrawDashboard() {
+        return {
+            balance: adminUser.balance,
+            summary: {
+                sales_income: 2860000,
+                mission_income: 4200,
+                withdrawn_pending: 693000,
+                total_in: 3420000
+            },
+            missionToday: {
+                completed: false,
+                usedAt: null
+            },
+            products: products.map((item, index) => ({
+                id: item.id,
+                title: item.title,
+                slug: item.slug,
+                status: item.status,
+                paid_sales: item.purchase_count,
+                purchase_count: item.purchase_count,
+                view_count: item.view_count,
+                income: Number(item.effective_price || item.price || 0) * Math.max(1, Number(item.purchase_count || 0) - index)
+            })),
+            withdraws: [
+                { id: 701, amount: 700000, fee: 7000, net_amount: 693000, status: 'pending', expected_at: daysAgo(-3) },
+                { id: 702, amount: 450000, fee: 4500, net_amount: 445500, status: 'approved', expected_at: daysAgo(2) }
+            ],
+            recentTransactions: [
+                { type: 'sale_income', amount: 1200000, description: 'Doanh thu source web bán dịch vụ MXH', created_at: daysAgo(1) },
+                { type: 'mission_reward', amount: 400, description: 'Thưởng nhiệm vụ vượt Link4m', created_at: daysAgo(1) },
+                { type: 'withdraw', amount: -700000, description: 'Tạo lệnh rút tiền', created_at: daysAgo(2) }
+            ]
+        };
+    }
+
+    function dailyCheckinStatus(completed = false) {
+        const todayKey = new Date().toISOString().slice(0, 10);
+        const rewards = [
+            { day: 1, amount: 1000, label: 'Bắt đầu' },
+            { day: 2, amount: 1500, label: 'Ổn định' },
+            { day: 3, amount: 2000, label: 'Tăng tốc' },
+            { day: 4, amount: 2500, label: 'Chuyên cần' },
+            { day: 5, amount: 3000, label: 'Bền bỉ' },
+            { day: 6, amount: 4000, label: 'Gần đích' },
+            { day: 7, amount: 5000, label: 'Mốc tuần' }
+        ];
+        const todayClaim = completed
+            ? { claimDate: todayKey, rewardDay: 3, consecutiveDays: 3, rewardAmount: 2000, rewardLabel: 'Tăng tốc' }
+            : null;
+
+        return {
+            enabled: true,
+            title: 'Điểm danh hôm nay',
+            subtitle: 'Nhận thưởng mỗi ngày, giữ streak để tăng mốc quà.',
+            timezone: 'Asia/Bangkok',
+            todayKey,
+            canClaim: !completed,
+            streakBroken: false,
+            consecutiveDays: completed ? 3 : 2,
+            nextConsecutiveDays: completed ? 3 : 3,
+            nextRewardDay: 3,
+            todayClaim,
+            rewards,
+            history: [
+                ...(todayClaim ? [todayClaim] : []),
+                { claimDate: daysAgo(1).slice(0, 10), rewardDay: 2, consecutiveDays: 2, rewardAmount: 1500, rewardLabel: 'Ổn định' },
+                { claimDate: daysAgo(2).slice(0, 10), rewardDay: 1, consecutiveDays: 1, rewardAmount: 1000, rewardLabel: 'Bắt đầu' }
+            ]
+        };
+    }
+
+    function missionStatus(completed = false) {
+        return {
+            reward: 400,
+            missionDate: new Date().toISOString().slice(0, 10),
+            completedToday: completed,
+            hasKey: !completed,
+            usedAt: completed ? now : null
+        };
+    }
+
+    function buildDemoMissionLink() {
+        const key = `DEMO-SANG-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}`;
+        const destination = new URL('/vuot-link.html', window.location.origin);
+        destination.searchParams.set('token', key);
+
+        const link4mDemo = new URL('/link4m-demo.html', window.location.origin);
+        link4mDemo.searchParams.set('to', destination.toString());
+        return link4mDemo.toString();
+    }
+
+    function communityMessages() {
+        return [
+            { id: 1, user_id: 1, full_name: 'Admin Test', gender: 'male', is_verified: 1, content: 'Chào mọi người, khu cộng đồng demo đã sẵn sàng để test giao diện.', created_at: daysAgo(1) },
+            { id: 2, user_id: 2, full_name: 'Seller Demo', gender: 'male', is_verified: 1, content: 'Mình vừa đăng thêm source marketplace và tool MMO.', created_at: now }
+        ];
+    }
+
     function inspectUser(userId) {
         const user = users.find(item => String(item.id) === String(userId)) || users[0];
         return {
@@ -535,6 +633,26 @@ const DemoApiFallback = (() => {
         const { path, params } = parseEndpoint(endpoint);
 
         if (upperMethod !== 'GET') {
+            if (isDemoAdmin() && path === '/mission/generate-link') {
+                const shortLink = buildDemoMissionLink();
+                return success({
+                    link: shortLink,
+                    shortLink,
+                    provider: 'link4m-demo',
+                    completedToday: false,
+                    message: 'Vượt Link4m để lấy key độc quyền. Key chỉ dùng được 1 lần trong ngày.'
+                });
+            }
+            if (isDemoAdmin() && path === '/mission/claim') {
+                return success({ rewardAmount: 400, newBalance: adminUser.balance + 400 }, { message: 'Đã cộng 400đ vào tài khoản demo.' });
+            }
+            if (isDemoAdmin() && path === '/wallet/daily-checkin/claim') {
+                return success({
+                    reward: { day: 3, amount: 2000, label: 'Tăng tốc' },
+                    balance: adminUser.balance + 2000,
+                    state: dailyCheckinStatus(true)
+                }, { message: 'Điểm danh demo thành công' });
+            }
             if (isDemoAdmin() || path.startsWith('/admin') || path.includes('/purchase') || path.startsWith('/withdraw/admin')) {
                 return mutation();
             }
@@ -549,6 +667,14 @@ const DemoApiFallback = (() => {
         if (path === '/products') return success(listProducts(params));
         if (path === '/users/search') return success({ users: users.slice(0, getLimit(params, 8)) });
         if (path === '/posts') return success({ posts });
+        if (path === '/withdraw/dashboard') return success(withdrawDashboard());
+        if (path === '/wallet/daily-checkin') return success(dailyCheckinStatus(false));
+        if (path === '/mission/status') return success(missionStatus(false));
+        if (path === '/community/messages') return success(communityMessages());
+        if (path === '/support/thread') return success([
+            { id: 1, sender_id: 1, content: 'Admin demo: bạn cứ gửi nội dung cần hỗ trợ tại đây.', created_at: daysAgo(1) },
+            { id: 2, sender_id: 3, content: 'Mình cần kiểm tra giao diện cộng đồng.', created_at: now }
+        ]);
 
         const userMatch = path.match(/^\/users\/(\d+)$/);
         if (userMatch) return success(users.find(user => String(user.id) === userMatch[1]) || users[0]);
@@ -657,6 +783,11 @@ const DemoApiFallback = (() => {
             return path === '/auth/me'
                 || path === '/users/search'
                 || path === '/posts'
+                || path === '/withdraw/dashboard'
+                || path === '/wallet/daily-checkin'
+                || path === '/mission/status'
+                || path === '/community/messages'
+                || path === '/support/thread'
                 || path.startsWith('/users/')
                 || path.startsWith('/admin')
                 || path.startsWith('/withdraw/admin');

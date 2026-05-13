@@ -247,8 +247,7 @@ class App {
 
     initTheme() {
         const saved = localStorage.getItem(this.themeStorageKey);
-        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const theme = saved === 'light' || saved === 'dark' ? saved : (prefersDark ? 'dark' : 'light');
+        const theme = saved === 'light' || saved === 'dark' ? saved : 'light';
         this.applyTheme(theme, { persist: false });
     }
 
