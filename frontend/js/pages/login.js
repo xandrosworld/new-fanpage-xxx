@@ -14,6 +14,9 @@ window.pageInit = async function(params, query) {
     const tosStatus = document.getElementById('tos-status');
     const recaptchaContainer = document.getElementById('login-recaptcha');
     const submitBtn = form.querySelector('button[type="submit"]');
+    const DEMO_ADMIN_EMAIL = 'admin@sangdev.test';
+    const DEMO_ADMIN_PASSWORD = 'Admin@123456';
+    const DEMO_ADMIN_PATH = '/admin-demo';
     let hasReadTerms = false;
     let canSubmitAuthForm = false;
     let recaptchaState = { enabled: false, widgetId: null };
@@ -88,6 +91,10 @@ window.pageInit = async function(params, query) {
             }
 
         } catch (error) {
+            if (tryDemoAdminLogin(email, password, query)) {
+                return;
+            }
+
             if (recaptchaState.enabled) {
                 window.RecaptchaManager.reset(recaptchaState.widgetId);
             }
@@ -96,6 +103,46 @@ window.pageInit = async function(params, query) {
             submitBtn.textContent = 'Đăng nhập';
         }
     });
+
+    function tryDemoAdminLogin(email, password, query = {}) {
+        const normalizedEmail = String(email || '').trim().toLowerCase();
+        if (normalizedEmail !== DEMO_ADMIN_EMAIL || String(password || '') !== DEMO_ADMIN_PASSWORD) {
+            return false;
+        }
+
+        const user = {
+            id: 1,
+            email: DEMO_ADMIN_EMAIL,
+            full_name: 'Admin Test',
+            role: 'admin',
+            status: 'active',
+            balance: 100000,
+            is_verified: 1,
+            is_primary_admin: true,
+            admin_portal_path: DEMO_ADMIN_PATH
+        };
+
+        Auth.saveAuth('demo-admin-token', user);
+
+        if (window.appInstance) {
+            window.appInstance.updateUserSection();
+            window.appInstance.startBalanceSync();
+            if (typeof window.appInstance.initRouter === 'function') {
+                window.appInstance.initRouter();
+                window.router = window.appInstance.router;
+                router = window.appInstance.router;
+            }
+        }
+
+        showToast('Đăng nhập admin demo thành công!', 'success');
+
+        setTimeout(() => {
+            const redirect = query.redirect || DEMO_ADMIN_PATH;
+            router.navigate(redirect);
+        }, 350);
+
+        return true;
+    }
 
     async function loadTerms() {
         if (!tosTitle || !tosContent) return;

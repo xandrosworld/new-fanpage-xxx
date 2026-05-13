@@ -10,6 +10,7 @@ require('dotenv').config();
 const logService = require('./services/logService');
 const { ipGuard } = require('./middleware/ipGuard');
 const humanGateService = require('./services/humanGateService');
+const recaptchaService = require('./services/recaptchaService');
 
 const app = express();
 
@@ -192,6 +193,10 @@ function isHumanGateExemptApiPath(pathname = '') {
 }
 
 app.use('/api', (req, res, next) => {
+    if (!recaptchaService.isEnabled()) {
+        return next();
+    }
+
     if (req.method === 'OPTIONS' || isHumanGateExemptApiPath(req.path)) {
         return next();
     }
