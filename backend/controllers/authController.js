@@ -9,11 +9,10 @@ const logService = require('../services/logService');
 const notificationService = require('../services/notificationService');
 const recaptchaService = require('../services/recaptchaService');
 const { getAdminPortalPath } = require('../services/adminAccessService');
-const PRIMARY_ADMIN_EMAIL = String(process.env.PRIMARY_ADMIN_EMAIL || 'duongthithuyhangkupee@gmail.com').trim().toLowerCase();
+const { isPrimaryAdminUser } = require('../utils/adminIdentity');
 
 function isPrimaryAdmin(user = {}) {
-    return String(user.email || '').trim().toLowerCase() === PRIMARY_ADMIN_EMAIL
-        && String(user.role || '').trim().toLowerCase() === 'admin';
+    return isPrimaryAdminUser(user);
 }
 
 function withPrivatePortal(user) {

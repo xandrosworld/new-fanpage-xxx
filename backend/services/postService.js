@@ -6,7 +6,7 @@
 const db = require('../config/database');
 const { getArchive, purgeArchivedPosts } = require('./archiveService');
 const spamProtectionService = require('./spamProtectionService');
-const PRIMARY_ADMIN_EMAIL = process.env.PRIMARY_ADMIN_EMAIL || 'duongthithuyhangkupee@gmail.com';
+const { isPrimaryAdminEmail } = require('../utils/adminIdentity');
 
 
 function normalizeArchivePost(post = {}) {
@@ -260,7 +260,7 @@ class PostService {
         }
 
         const requesterEmail = await getUserEmailById(userId);
-        if (posts[0].author_email === PRIMARY_ADMIN_EMAIL && requesterEmail !== PRIMARY_ADMIN_EMAIL) {
+        if (isPrimaryAdminEmail(posts[0].author_email) && !isPrimaryAdminEmail(requesterEmail)) {
             throw new Error('Không thể xóa bài đăng của admin chính');
         }
 

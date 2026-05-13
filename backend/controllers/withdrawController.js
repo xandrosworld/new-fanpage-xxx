@@ -1,10 +1,13 @@
 const db = require('../config/database');
 const notificationService = require('../services/notificationService');
+const {
+    PRIMARY_ADMIN_EMAIL,
+    isPrimaryAdminUser
+} = require('../utils/adminIdentity');
 
 const WITHDRAW_FEE_RATE = 0.10;
 const MIN_WITHDRAW_AMOUNT = 100000;
 const APP_TIMEZONE = 'Asia/Bangkok';
-const PRIMARY_ADMIN_EMAIL = String(process.env.PRIMARY_ADMIN_EMAIL || 'duongthithuyhangkupee@gmail.com').trim().toLowerCase();
 
 function canWithdraw(role = '') {
     return ['admin', 'seller'].includes(String(role || '').toLowerCase());
@@ -56,8 +59,7 @@ function serializeWithdrawBankInfo(input = {}) {
 }
 
 function isPrimaryAdmin(user = {}) {
-    return String(user.email || '').trim().toLowerCase() === PRIMARY_ADMIN_EMAIL
-        && String(user.role || '').trim().toLowerCase() === 'admin';
+    return isPrimaryAdminUser(user);
 }
 
 async function getPrimaryAdminUser() {

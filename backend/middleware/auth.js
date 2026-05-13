@@ -5,16 +5,14 @@
 
 const jwt = require('jsonwebtoken');
 const db = require('../config/database');
+const { isPrimaryAdminUser } = require('../utils/adminIdentity');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-const PRIMARY_ADMIN_EMAIL = String(process.env.PRIMARY_ADMIN_EMAIL || 'duongthithuyhangkupee@gmail.com').trim().toLowerCase();
 
 function decorateUser(user = {}) {
-    const primaryAdmin = String(user.email || '').trim().toLowerCase() === PRIMARY_ADMIN_EMAIL
-        && String(user.role || '').trim().toLowerCase() === 'admin';
     return {
         ...user,
-        is_primary_admin: primaryAdmin
+        is_primary_admin: isPrimaryAdminUser(user)
     };
 }
 

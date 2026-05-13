@@ -31,7 +31,10 @@ const {
     clearSecurityLockForUser,
     unlockAccountsByIp
 } = require('../services/ipAccountSecurityService');
-const PRIMARY_ADMIN_EMAIL = process.env.PRIMARY_ADMIN_EMAIL || 'duongthithuyhangkupee@gmail.com';
+const {
+    PRIMARY_ADMIN_EMAIL,
+    isPrimaryAdminUser
+} = require('../utils/adminIdentity');
 const FRAMES_DIR = path.join(__dirname, '../../khungcanhan');
 const CUSTOM_FRAMES_DIR = path.join(FRAMES_DIR, 'custom');
 const FRAME_ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
@@ -130,11 +133,11 @@ async function getUserUnlockContext(userId) {
 }
 
 function isPrimaryAdmin(user) {
-    return !!user && user.email === PRIMARY_ADMIN_EMAIL;
+    return isPrimaryAdminUser(user);
 }
 
 function isRequestFromPrimary(req) {
-    return req.user && req.user.email === PRIMARY_ADMIN_EMAIL;
+    return isPrimaryAdminUser(req.user);
 }
 
 async function verifyAdminPassword(adminId, password) {

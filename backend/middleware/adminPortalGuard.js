@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../config/database');
 const { JWT_SECRET } = require('./auth');
 const { getAdminPortalPath } = require('../services/adminAccessService');
-const PRIMARY_ADMIN_EMAIL = String(process.env.PRIMARY_ADMIN_EMAIL || 'duongthithuyhangkupee@gmail.com').trim().toLowerCase();
+const { isPrimaryAdminUser } = require('../utils/adminIdentity');
 
 function normalizePathname(pathname = '') {
     return `/${String(pathname || '').replace(/\\/g, '/').replace(/^\/+/, '').replace(/\/{2,}/g, '/')}`.replace(/\/$/, '') || '/';
@@ -41,9 +41,7 @@ async function isAuthenticatedAdminRequest(req) {
         }
 
         const user = rows[0];
-        return user.status === 'active'
-            && user.role === 'admin'
-            && String(user.email || '').trim().toLowerCase() === PRIMARY_ADMIN_EMAIL;
+        return user.status === 'active' && isPrimaryAdminUser(user);
     } catch (_) {
         return false;
     }

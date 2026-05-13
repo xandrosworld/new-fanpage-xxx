@@ -11,7 +11,7 @@ const ASSET_SESSION_SECRET = String(
     process.env.SESSION_SECRET ||
     'source-market-asset-session'
 );
-const PRIMARY_ADMIN_EMAIL = String(process.env.PRIMARY_ADMIN_EMAIL || 'duongthithuyhangkupee@gmail.com').trim().toLowerCase();
+const { isPrimaryAdminUser } = require('../utils/adminIdentity');
 
 function normalizeAssetPath(requestedPath = '') {
     const normalized = path.posix.normalize(`/${String(requestedPath || '').replace(/\\/g, '/').replace(/^\/+/, '')}`);
@@ -36,8 +36,7 @@ function resolveAssetPath(assetPath) {
 
 function ensureAssetAccess(assetPath, user = null) {
     const normalizedRole = String(user?.role || '').trim().toLowerCase();
-    const isPrimaryAdmin = normalizedRole === 'admin'
-        && String(user?.email || '').trim().toLowerCase() === PRIMARY_ADMIN_EMAIL;
+    const isPrimaryAdmin = isPrimaryAdminUser(user);
     const protectedRoles = new Map([
         ['/pages/admin.html', ['primary_admin']],
         ['/pages/dangban.html', ['admin', 'seller']],

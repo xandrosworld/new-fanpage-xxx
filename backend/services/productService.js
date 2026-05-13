@@ -7,7 +7,7 @@ const db = require('../config/database');
 const { queueFullBackup } = require('./telegramBackupService');
 const { getArchive, purgeArchivedProducts } = require('./archiveService');
 const spamProtectionService = require('./spamProtectionService');
-const PRIMARY_ADMIN_EMAIL = process.env.PRIMARY_ADMIN_EMAIL || 'duongthithuyhangkupee@gmail.com';
+const { isPrimaryAdminEmail } = require('../utils/adminIdentity');
 const PRODUCT_SALE_SETTING_KEYS = [
     'product_sale_enabled',
     'product_sale_scope',
@@ -949,7 +949,7 @@ class ProductService {
 
             const review = rows[0];
             const isPrimaryAdminRequester = requesterRole === 'admin'
-                && String(requesterEmail || '').trim().toLowerCase() === PRIMARY_ADMIN_EMAIL;
+                && isPrimaryAdminEmail(requesterEmail);
             const canDelete = isPrimaryAdminRequester
                 || Number(review.user_id) === Number(requesterId)
                 || Number(product.seller_id) === Number(requesterId);
@@ -1092,12 +1092,12 @@ class ProductService {
             }
 
             const requesterEmail = await getUserEmailById(userId);
-            if (products[0].seller_email === PRIMARY_ADMIN_EMAIL && requesterEmail !== PRIMARY_ADMIN_EMAIL) {
+            if (isPrimaryAdminEmail(products[0].seller_email) && !isPrimaryAdminEmail(requesterEmail)) {
                 throw new Error('Không thể chỉnh sửa sản phẩm của admin chính');
             }
 
             const isPrimaryAdminRequester = userRole === 'admin'
-                && String(requesterEmailFromController || requesterEmail || '').trim().toLowerCase() === PRIMARY_ADMIN_EMAIL;
+                && isPrimaryAdminEmail(requesterEmailFromController || requesterEmail);
 
             if (!isPrimaryAdminRequester && Number(products[0].seller_id) !== Number(userId)) {
                 throw new Error('You do not have permission to edit this product');
@@ -1183,12 +1183,12 @@ class ProductService {
             }
 
             const requesterEmail = await getUserEmailById(userId);
-            if (products[0].seller_email === PRIMARY_ADMIN_EMAIL && requesterEmail !== PRIMARY_ADMIN_EMAIL) {
+            if (isPrimaryAdminEmail(products[0].seller_email) && !isPrimaryAdminEmail(requesterEmail)) {
                 throw new Error('Không thể xóa sản phẩm của admin chính');
             }
 
             const isPrimaryAdminRequester = userRole === 'admin'
-                && String(requesterEmailFromController || requesterEmail || '').trim().toLowerCase() === PRIMARY_ADMIN_EMAIL;
+                && isPrimaryAdminEmail(requesterEmailFromController || requesterEmail);
 
             if (!isPrimaryAdminRequester && Number(products[0].seller_id) !== Number(userId)) {
                 throw new Error('You do not have permission to delete this product');
