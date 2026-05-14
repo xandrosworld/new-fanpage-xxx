@@ -25,8 +25,9 @@ function isPrimaryAdminEmail(email = '') {
 }
 
 function isPrimaryAdminUser(user = {}) {
-    return String(user.role || '').trim().toLowerCase() === 'admin'
-        && isPrimaryAdminEmail(user.email);
+    const account = user || {};
+    return String(account.role || '').trim().toLowerCase() === 'admin'
+        && isPrimaryAdminEmail(account.email);
 }
 
 module.exports = {

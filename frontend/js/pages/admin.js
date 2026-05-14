@@ -151,61 +151,53 @@ window.pageInit = async function(params, query = {}) {
                 const reqTotal = reqStats.total ?? reqStats.buffered ?? 0;
                 const reqLast1h = reqStats.last1h ?? 0;
                 const reqLast5m = reqStats.last5m ?? 0;
+                const vipCustomers = Array.isArray(d.vipCustomers) ? d.vipCustomers : [];
+                const vipSeries = Array.isArray(d.vipCustomerSeries) ? d.vipCustomerSeries : vipCustomers.map(customer => ({
+                    label: customer.displayName || customer.fullName || customer.email || `User #${customer.id}`,
+                    shortLabel: customer.displayName || customer.fullName || customer.email || `#${customer.id}`,
+                    value: Number(customer.totalSpent || customer.balance || 0)
+                }));
+                const vipTotalSpent = Number(d.vipTotalSpent || vipCustomers.reduce((sum, item) => sum + Number(item.totalSpent || 0), 0));
+                const vipCount = Number(d.vipCount || vipCustomers.filter(item => item.tier && item.tier !== 'silver').length);
+                const trafficSeries = Array.isArray(d.trafficByHour) ? d.trafficByHour : [];
+                const peakTrafficHour = d.peakTrafficHour || trafficSeries.reduce((best, item) => (
+                    Number(item.value || 0) > Number(best.value || 0) ? item : best
+                ), { label: '--:--', shortLabel: '--', value: 0 });
+                const peakTrafficLabel = peakTrafficHour.shortLabel || peakTrafficHour.label || '--';
+                const peakTrafficCount = Number(peakTrafficHour.value || 0);
                 const cpuLoadPercent = Math.max(0, Math.min(100, Math.round((load1m / Math.max(cpu.cores || 1, 1)) * 100)));
                 const reqLoadPercent = reqLast1h > 0 ? Math.max(0, Math.min(100, Math.round((reqLast5m / Math.max(reqLast1h, 1)) * 100))) : 0;
 
                 container.innerHTML = `
-                    <div class="stat-grid admin-stat-grid">
-                        <div class="stat-card stat-card--revenue">
-                            <div class="stat-card-icon"><i class="fas fa-coins"></i></div>
-                            <div class="stat-card-body">
-                                <div class="stat-card-label">Doanh thu (tổng)</div>
-                                <div class="stat-card-value">${formatMoney(d.totalRevenue)}</div>
+                    <section class="admin-overview-strip" aria-label="Tổng quan nhanh">
+                        <div class="admin-overview-main">
+                            <span class="admin-overview-label">Doanh thu tổng</span>
+                            <strong>${formatMoney(d.totalRevenue)}</strong>
+                            <span>30 ngày: ${formatMoney(dailyTotal)} · 12 tháng: ${formatMoney(monthlyTotal)}</span>
+                        </div>
+                        <div class="admin-overview-metrics">
+                            <div class="admin-overview-metric">
+                                <i class="fas fa-users"></i>
+                                <span>Người dùng</span>
+                                <strong>${d.totalUsers}</strong>
+                            </div>
+                            <div class="admin-overview-metric">
+                                <i class="fas fa-user-check"></i>
+                                <span>Hoạt động</span>
+                                <strong>${d.activeUsers}</strong>
+                            </div>
+                            <div class="admin-overview-metric">
+                                <i class="fas fa-box-open"></i>
+                                <span>Sản phẩm</span>
+                                <strong>${d.totalProducts}</strong>
+                            </div>
+                            <div class="admin-overview-metric">
+                                <i class="fas fa-database"></i>
+                                <span>Dữ liệu</span>
+                                <strong>${formatBytes(d.dbSizeBytes || 0)}</strong>
                             </div>
                         </div>
-                        <div class="stat-card stat-card--revenue30">
-                            <div class="stat-card-icon"><i class="fas fa-calendar-days"></i></div>
-                            <div class="stat-card-body">
-                                <div class="stat-card-label">Doanh thu 30 ngày</div>
-                                <div class="stat-card-value">${formatMoney(dailyTotal)}</div>
-                            </div>
-                        </div>
-                        <div class="stat-card stat-card--revenue12">
-                            <div class="stat-card-icon"><i class="fas fa-chart-line"></i></div>
-                            <div class="stat-card-body">
-                                <div class="stat-card-label">Doanh thu 12 tháng</div>
-                                <div class="stat-card-value">${formatMoney(monthlyTotal)}</div>
-                            </div>
-                        </div>
-                        <div class="stat-card stat-card--users">
-                            <div class="stat-card-icon"><i class="fas fa-users"></i></div>
-                            <div class="stat-card-body">
-                                <div class="stat-card-label">Tổng người dùng</div>
-                                <div class="stat-card-value">${d.totalUsers}</div>
-                            </div>
-                        </div>
-                        <div class="stat-card stat-card--active">
-                            <div class="stat-card-icon"><i class="fas fa-user-check"></i></div>
-                            <div class="stat-card-body">
-                                <div class="stat-card-label">User hoạt động</div>
-                                <div class="stat-card-value">${d.activeUsers}</div>
-                            </div>
-                        </div>
-                        <div class="stat-card stat-card--products">
-                            <div class="stat-card-icon"><i class="fas fa-box-open"></i></div>
-                            <div class="stat-card-body">
-                                <div class="stat-card-label">Sản phẩm</div>
-                                <div class="stat-card-value">${d.totalProducts}</div>
-                            </div>
-                        </div>
-                        <div class="stat-card stat-card--storage">
-                            <div class="stat-card-icon"><i class="fas fa-database"></i></div>
-                            <div class="stat-card-body">
-                                <div class="stat-card-label">Dung lượng dữ liệu</div>
-                                <div class="stat-card-value">${formatBytes(d.dbSizeBytes || 0)}</div>
-                            </div>
-                        </div>
-                    </div>
+                    </section>
                     <div class="section-card section-spaced">
                         <div class="section-header">
                             <div>
@@ -262,6 +254,37 @@ window.pageInit = async function(params, query = {}) {
                             <div id="chart-monthly" class="line-chart"></div>
                         </div>
                     </div>
+                    <div class="chart-grid dashboard-insight-grid">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div>
+                                    <div class="chart-title"><i class="fas fa-crown" style="margin-right:6px;color:#f59e0b"></i>Khách VIP</div>
+                                    <div class="chart-subtitle">Top khách theo tổng chi tiêu và số lượt mua</div>
+                                </div>
+                                <div class="chart-total">${formatMoney(vipTotalSpent)}</div>
+                            </div>
+                            <div class="dashboard-insight-meta">
+                                <span><i class="fas fa-user-shield"></i> ${vipCount} VIP nổi bật</span>
+                                <span><i class="fas fa-users"></i> ${vipCustomers.length} khách theo dõi</span>
+                            </div>
+                            <div id="chart-vip-customers" class="line-chart"></div>
+                            ${renderVipCustomerRows(vipCustomers)}
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div>
+                                    <div class="chart-title"><i class="fas fa-clock" style="margin-right:6px;color:#0ea5e9"></i>Truy cập theo giờ</div>
+                                    <div class="chart-subtitle">Giờ web đông nhất trong ${Number(d.trafficWindowHours || 24)} giờ gần đây</div>
+                                </div>
+                                <div class="chart-total">${escapeHtml(peakTrafficLabel)} · ${peakTrafficCount} req</div>
+                            </div>
+                            <div class="dashboard-insight-meta">
+                                <span><i class="fas fa-fire"></i> Peak: ${escapeHtml(peakTrafficLabel)}</span>
+                                <span><i class="fas fa-globe"></i> ${escapeHtml(d.trafficTimezone || 'local')}</span>
+                            </div>
+                            <div id="chart-traffic-hour" class="line-chart"></div>
+                        </div>
+                    </div>
                     <div class="section-spaced">
                         <button id="reset-revenue" class="btn-primary"><i class="fas fa-rotate-left" style="margin-right:6px"></i>Reset doanh thu</button>
                     </div>
@@ -280,11 +303,62 @@ window.pageInit = async function(params, query = {}) {
 
                 renderComboChart(document.getElementById('chart-daily'), dailySeries, { maxPoints: 30, labelFormat: 'day' });
                 renderComboChart(document.getElementById('chart-monthly'), monthlySeries, { maxPoints: 12, labelFormat: 'month' });
+                renderComboChart(document.getElementById('chart-vip-customers'), vipSeries, {
+                    maxPoints: 8,
+                    labelFormat: 'name',
+                    legendBarLabel: 'Chi tiêu',
+                    legendLineLabel: 'Xếp hạng'
+                });
+                renderComboChart(document.getElementById('chart-traffic-hour'), trafficSeries, {
+                    maxPoints: 24,
+                    labelFormat: 'hour',
+                    valueFormatter: value => `${Number(value || 0)} req`,
+                    axisFormatter: value => formatCompactValue(value),
+                    legendBarLabel: 'Requests',
+                    legendLineLabel: 'Nhịp truy cập'
+                });
                 await loadDashboardSecurityShortcut();
             }
         } catch (error) {
             container.innerHTML = '<p>Không thể tải dashboard.</p>';
         }
+    }
+
+    function renderVipCustomerRows(customers = []) {
+        if (!customers.length) {
+            return `
+                <div class="vip-customer-list is-empty">
+                    <span>Chưa có dữ liệu khách VIP.</span>
+                </div>
+            `;
+        }
+
+        const tierLabel = {
+            diamond: 'Diamond',
+            gold: 'Gold',
+            silver: 'Silver'
+        };
+
+        return `
+            <div class="vip-customer-list">
+                ${customers.slice(0, 4).map((customer, index) => {
+                    const name = customer.displayName || customer.fullName || customer.email || `User #${customer.id}`;
+                    const totalSpent = Number(customer.totalSpent || 0);
+                    const purchaseCount = Number(customer.purchaseCount || 0);
+                    const tier = customer.tier || 'silver';
+                    return `
+                        <a class="vip-customer-row" href="/trangcanhan/${customer.id}" data-link>
+                            <span class="vip-customer-rank">#${index + 1}</span>
+                            <span class="vip-customer-main">
+                                <strong>${escapeHtml(name)}</strong>
+                                <small>${purchaseCount} lượt mua · ${formatMoney(totalSpent)}</small>
+                            </span>
+                            <span class="vip-customer-tier vip-customer-tier--${escapeHtml(tier)}">${tierLabel[tier] || 'VIP'}</span>
+                        </a>
+                    `;
+                }).join('')}
+            </div>
+        `;
     }
 
     async function loadDashboardSecurityShortcut() {
@@ -3059,8 +3133,15 @@ window.pageInit = async function(params, query = {}) {
         }
 
         const maxPoints = options.maxPoints || series.length;
-        const data = series.slice(-maxPoints);
+        const data = series.slice(-maxPoints).map(item => ({
+            ...item,
+            value: Number(item.value || 0)
+        }));
         const maxVal = Math.max(...data.map(d => d.value || 0), 1);
+        const valueFormatter = typeof options.valueFormatter === 'function' ? options.valueFormatter : formatMoney;
+        const axisFormatter = typeof options.axisFormatter === 'function' ? options.axisFormatter : formatCompactValue;
+        const legendBarLabel = options.legendBarLabel || 'Doanh thu';
+        const legendLineLabel = options.legendLineLabel || 'Xu hướng';
 
         const W = 560;
         const H = 200;
@@ -3109,9 +3190,7 @@ window.pageInit = async function(params, query = {}) {
         const gridLines = [0, 0.25, 0.5, 0.75, 1].map(t => {
             const y = PT + (1 - t) * chartH;
             const val = maxVal * t;
-            const label = val >= 1e6 ? `${(val/1e6).toFixed(1)}M`
-                : val >= 1e3 ? `${(val/1e3).toFixed(0)}K`
-                : Math.round(val).toString();
+            const label = axisFormatter(val);
             return `
                 <line x1="${PL}" y1="${y}" x2="${W - PR}" y2="${y}"
                     stroke="var(--admin-grid-line,rgba(148,163,184,0.12))" stroke-width="1"
@@ -3126,11 +3205,10 @@ window.pageInit = async function(params, query = {}) {
             const x = sx(i) - barW / 2;
             const yTop = sy(d.value || 0);
             const barH = (PT + chartH) - yTop;
-            const lbl = options.labelFormat === 'month'
-                ? (d.label || '').slice(0, 7)
-                : (d.label || '').slice(5);
+            const lbl = formatChartLabel(d, options.labelFormat);
+            const titleText = escapeHtml(`${d.label || ''}: ${valueFormatter(d.value || 0)}`);
             return `
-                <g class="combo-bar-g" data-val="${formatMoney(d.value || 0)}" data-label="${d.label || ''}">
+                <g class="combo-bar-g" data-val="${escapeHtml(valueFormatter(d.value || 0))}" data-label="${escapeHtml(d.label || '')}">
                     <rect class="combo-bar-bg"
                         x="${x}" y="${PT}" width="${barW}" height="${chartH}"
                         rx="4" fill="transparent" />
@@ -3139,7 +3217,7 @@ window.pageInit = async function(params, query = {}) {
                         rx="4" fill="url(#${barGradId})"
                         style="transform-origin:${x + barW/2}px ${PT + chartH}px"
                     >
-                        <title>${d.label}: ${formatMoney(d.value || 0)}</title>
+                        <title>${titleText}</title>
                     </rect>
                     <text x="${sx(i)}" y="${PT + chartH + 16}" class="bar-label" text-anchor="middle">${lbl}</text>
                 </g>
@@ -3149,14 +3227,14 @@ window.pageInit = async function(params, query = {}) {
         // Dots
         const dots = pts.map((p, i) => `
             <circle class="combo-dot" cx="${p.x}" cy="${p.y}" r="4">
-                <title>${data[i].label}: ${formatMoney(data[i].value || 0)}</title>
+                <title>${escapeHtml(`${data[i].label || ''}: ${valueFormatter(data[i].value || 0)}`)}</title>
             </circle>
         `).join('');
 
         container.innerHTML = `
             <div class="combo-legend">
-                <span class="legend-item legend-bar">Doanh thu</span>
-                <span class="legend-item legend-line">Xu hướng</span>
+                <span class="legend-item legend-bar">${escapeHtml(legendBarLabel)}</span>
+                <span class="legend-item legend-line">${escapeHtml(legendLineLabel)}</span>
             </div>
             <div class="combo-chart-wrap">
                 <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" class="combo-svg">
@@ -3220,6 +3298,32 @@ window.pageInit = async function(params, query = {}) {
                 });
             });
         }
+    }
+
+    function formatChartLabel(item = {}, labelFormat = '') {
+        const label = String(item.shortLabel || item.label || '');
+        if (labelFormat === 'month') {
+            return escapeHtml(String(item.label || '').slice(0, 7));
+        }
+        if (labelFormat === 'day') {
+            return escapeHtml(String(item.label || '').slice(5));
+        }
+        if (labelFormat === 'hour') {
+            return escapeHtml(label || String(item.label || '').replace(':00', 'h'));
+        }
+        if (labelFormat === 'name') {
+            return escapeHtml(label.length > 10 ? `${label.slice(0, 10)}...` : label);
+        }
+        return escapeHtml(label.length > 12 ? `${label.slice(0, 12)}...` : label);
+    }
+
+    function formatCompactValue(value) {
+        const num = Number(value || 0);
+        if (!Number.isFinite(num)) return '0';
+        if (Math.abs(num) >= 1000000000) return `${(num / 1000000000).toFixed(1)}B`;
+        if (Math.abs(num) >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+        if (Math.abs(num) >= 1000) return `${Math.round(num / 1000)}K`;
+        return Math.round(num).toString();
     }
 
     function formatBytes(bytes) {

@@ -207,6 +207,7 @@ window.pageInit = async function(params, query) {
                 <div class="description-content product-description-box">
                     ${formatPlainTextHtml(product.content || product.description || 'Chưa có mô tả chi tiết')}
                 </div>
+                ${renderProductDetailImage()}
                 ${product.video_url ? `
                     <div class="product-video-block">
                         <h3>Video demo</h3>
@@ -448,6 +449,28 @@ window.pageInit = async function(params, query) {
         `;
     }
 
+    function renderProductDetailImage() {
+        const placeholderUrl = typeof getProductPlaceholderUrl === 'function' ? getProductPlaceholderUrl() : '';
+        const images = getProductGalleryUrls(product)
+            .filter(url => url && url !== placeholderUrl);
+        const detailImage = images[1] || '';
+
+        if (!detailImage) {
+            return '';
+        }
+
+        const safeUrl = escapeHtml(detailImage);
+        const safeTitle = escapeHtml(product.title || 'Sản phẩm');
+
+        return `
+            <figure class="product-detail-image-frame">
+                <img src="${safeUrl}"
+                     onerror="${getProductImageErrorHandler()}"
+                     alt="${safeTitle} - ảnh chi tiết">
+            </figure>
+        `;
+    }
+
     function renderReviews() {
         const avgRating = Number(reviewsData.avg_rating || product.avg_rating || 0);
         const reviewCount = Number(reviewsData.review_count || product.review_count || 0);
@@ -590,15 +613,18 @@ window.pageInit = async function(params, query) {
     function loadGallery() {
         const thumbsContainer = document.getElementById('gallery-thumbs');
         const mainImage = document.getElementById('main-image');
+        if (!thumbsContainer || !mainImage) {
+            return;
+        }
 
         const images = getProductGalleryUrls(product);
 
         thumbsContainer.innerHTML = images.map((img, index) => `
-            <img src="${img}" 
+            <img src="${escapeHtml(img)}"
                  onerror="${getProductImageErrorHandler()}"
-                 alt="Thumbnail ${index + 1}" 
+                 alt="Thumbnail ${index + 1}"
                  class="thumb ${index === 0 ? 'active' : ''}"
-                 data-image="${img}">
+                 data-image="${escapeHtml(img)}">
         `).join('');
 
         thumbsContainer.querySelectorAll('.thumb').forEach(thumb => {

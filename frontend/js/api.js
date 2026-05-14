@@ -45,15 +45,38 @@ const DemoApiFallback = (() => {
                     <stop offset="0%" stop-color="${from}"/>
                     <stop offset="100%" stop-color="${to}"/>
                 </linearGradient>
+                <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#101827"/>
+                    <stop offset="100%" stop-color="#172033"/>
+                </linearGradient>
+                <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+                    <path d="M48 0H0V48" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+                </pattern>
             </defs>
-            <rect width="960" height="720" rx="42" fill="url(#g)"/>
-            <rect x="90" y="90" width="780" height="540" rx="34" fill="rgba(255,255,255,.16)" stroke="rgba(255,255,255,.45)" stroke-width="3"/>
-            <circle cx="230" cy="210" r="54" fill="rgba(255,255,255,.28)"/>
-            <rect x="320" y="178" width="410" height="38" rx="19" fill="rgba(255,255,255,.35)"/>
-            <rect x="320" y="244" width="300" height="26" rx="13" fill="rgba(255,255,255,.24)"/>
-            <rect x="150" y="360" width="660" height="34" rx="17" fill="rgba(255,255,255,.28)"/>
-            <rect x="150" y="426" width="520" height="28" rx="14" fill="rgba(255,255,255,.22)"/>
-            <text x="480" y="565" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="800" fill="white">${label}</text>
+            <rect width="960" height="720" rx="28" fill="url(#g)"/>
+            <rect width="960" height="720" rx="28" fill="url(#grid)" opacity=".55"/>
+            <rect x="86" y="78" width="788" height="564" rx="24" fill="url(#panel)" opacity=".94"/>
+            <rect x="86" y="78" width="788" height="54" rx="24" fill="rgba(255,255,255,.08)"/>
+            <circle cx="126" cy="105" r="7" fill="#fb7185"/>
+            <circle cx="151" cy="105" r="7" fill="#fbbf24"/>
+            <circle cx="176" cy="105" r="7" fill="#34d399"/>
+            <text x="118" y="188" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="rgba(255,255,255,.62)">Sangdev preview</text>
+            <text x="118" y="240" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="800" fill="#ffffff">${label}</text>
+            <rect x="118" y="280" width="724" height="1" fill="rgba(255,255,255,.14)"/>
+            <g font-family="Consolas, 'Courier New', monospace" font-size="24" font-weight="700">
+                <text x="126" y="346" fill="#67e8f9">const</text>
+                <text x="208" y="346" fill="#f8fafc">product</text>
+                <text x="318" y="346" fill="#94a3b8">=</text>
+                <text x="350" y="346" fill="#86efac">{ ready: true }</text>
+                <text x="126" y="398" fill="#93c5fd">render</text>
+                <text x="216" y="398" fill="#f8fafc">(marketplace)</text>
+                <text x="126" y="450" fill="#fbbf24">deploy</text>
+                <text x="218" y="450" fill="#f8fafc">.done()</text>
+            </g>
+            <rect x="118" y="504" width="724" height="58" rx="12" fill="rgba(255,255,255,.08)"/>
+            <rect x="142" y="525" width="194" height="16" rx="8" fill="rgba(255,255,255,.42)"/>
+            <rect x="366" y="525" width="132" height="16" rx="8" fill="rgba(255,255,255,.24)"/>
+            <rect x="528" y="525" width="214" height="16" rx="8" fill="rgba(255,255,255,.18)"/>
         </svg>
     `)}`;
 
@@ -476,6 +499,40 @@ const DemoApiFallback = (() => {
     }
 
     function dashboard() {
+        const vipCustomers = users
+            .filter(user => user.role !== 'admin')
+            .map((user, index) => {
+                const totalSpent = [3600000, 1820000, 760000][index] || 420000;
+                return {
+                    id: user.id,
+                    email: user.email,
+                    fullName: user.full_name,
+                    displayName: user.full_name || user.email,
+                    role: user.role,
+                    balance: Number(user.balance || 0),
+                    isVerified: Boolean(user.is_verified),
+                    purchaseCount: [8, 4, 2][index] || 1,
+                    totalSpent,
+                    spent30d: Math.round(totalSpent * 0.42),
+                    lastPurchaseAt: daysAgo(index + 1),
+                    lastLogin: user.last_login || daysAgo(index),
+                    tier: index === 0 ? 'diamond' : index === 1 ? 'gold' : 'silver'
+                };
+            });
+        const trafficByHour = Array.from({ length: 24 }, (_, index) => {
+            const hour = String(index).padStart(2, '0');
+            const wave = Math.round(18 + Math.sin((index - 7) / 24 * Math.PI * 2) * 11);
+            const lunchBoost = index >= 11 && index <= 13 ? 24 : 0;
+            const eveningBoost = index >= 20 && index <= 22 ? 42 : 0;
+            const value = Math.max(2, wave + lunchBoost + eveningBoost + (index % 3) * 3);
+            return {
+                label: `${hour}:00`,
+                shortLabel: `${hour}h`,
+                value
+            };
+        });
+        const peakTrafficHour = trafficByHour.reduce((best, item) => item.value > best.value ? item : best, trafficByHour[0]);
+
         return {
             totalRevenue: 12850000,
             totalUsers: users.length,
@@ -495,6 +552,18 @@ const DemoApiFallback = (() => {
                 load: { '1m': 0.42, '5m': 0.31, '15m': 0.22 }
             },
             requestStats: { total: 1842, buffered: 200, last1h: 126, last5m: 14 },
+            vipCustomers,
+            vipCustomerSeries: vipCustomers.map(customer => ({
+                label: customer.displayName,
+                shortLabel: customer.displayName.length > 10 ? `${customer.displayName.slice(0, 10)}...` : customer.displayName,
+                value: customer.totalSpent
+            })),
+            vipTotalSpent: vipCustomers.reduce((sum, item) => sum + item.totalSpent, 0),
+            vipCount: vipCustomers.filter(item => item.tier !== 'silver').length,
+            trafficByHour,
+            peakTrafficHour,
+            trafficWindowHours: 24,
+            trafficTimezone: 'Asia/Saigon',
             dbSizeBytes: 824000
         };
     }

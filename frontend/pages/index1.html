@@ -1,85 +1,55 @@
-<div class="home-page home-market-page">
+<div class="home-page">
     <div class="container">
-        <section class="home-market-hero" aria-label="Trang chủ">
-            <div class="home-market-copy">
-                <div class="home-market-kicker">
-                    <i class="fas fa-bolt"></i>
-                    Source code · MXH · MMO
-                </div>
-                <h1 id="hero-title">Sang dev - chợ dịch vụ số cho seller MMO</h1>
-                <p id="hero-subtitle">Mua source, tài khoản mạng xã hội và tool MMO trong một giao diện gọn, rõ giá, dễ thanh toán và dễ quản lý sau khi mua.</p>
-                <div class="hero-actions">
-                    <a href="/?section=source" id="hero-btn-primary" data-link class="btn-primary">
-                        <i class="fas fa-code"></i>
-                        Xem source
-                    </a>
-                    <a href="/mxh" id="hero-btn-secondary" data-link class="btn-outline">
-                        <i class="fas fa-share-nodes"></i>
-                        Dịch vụ MXH
-                    </a>
-                </div>
+        <div id="home-banner-shell" class="home-banner-shell">
+            <button id="home-banner-toggle" class="home-banner-toggle" type="button" aria-expanded="true" aria-label="Đóng banner" title="Đóng banner">
+                <i id="home-banner-toggle-icon" class="fas fa-xmark"></i>
+            </button>
+            <div id="home-content-version-slot" class="home-content-version-slot">
+                <section class="hero">
+                    <div>
+                        <h1 id="hero-title">Dịch vụ lập trình Sang dev</h1>
+                        <p id="hero-subtitle">Mua bán source code rõ ràng, minh bạch,quy trình thanh toán an toàn.</p>
+                        <div class="hero-actions">
+                            <a href="/dangban" id="hero-btn-primary" data-link class="btn-primary">Đăng bán ngay</a>
+                            <a href="/naptien" id="hero-btn-secondary" data-link class="btn-outline">Nạp tiền</a>
+                        </div>
+                    </div>
+                    <div class="hero-card">
+                        <h3 class="section-title" id="hero-card-title">Vì sao chọn Sang dev shop?</h3>
+                        <p class="section-subtitle" id="hero-card-subtitle">Hệ thống phân loại rõ ràng, trình duyệt nhanh, giao dịch minh bạch.</p>
+                        <div class="badge-row section-spaced" id="hero-badges">
+                            <div class="badge badge-info">Bảo mật tài khoản</div>
+                            <div class="badge badge-success">Thanh toán linh hoạt</div>
+                        </div>
+                        <a href="/nhiemvu" data-link class="home-mission-link">
+                            <i class="fas fa-link"></i>
+                            <span>Nhiệm vụ Link4m 400đ</span>
+                        </a>
+                    </div>
+                </section>
             </div>
+        </div>
 
-            <div class="home-market-panel" aria-label="Lối tắt nhanh">
-                <a href="/nhiemvu" data-link>
-                    <span><i class="fas fa-key"></i> Lấy key nhiệm vụ</span>
-                    <strong>400đ</strong>
-                </a>
-                <a href="/diemdanh" data-link>
-                    <span><i class="fas fa-calendar-check"></i> Điểm danh</span>
-                    <strong>Mỗi ngày</strong>
-                </a>
-                <a href="/seller-dashboard" data-link>
-                    <span><i class="fas fa-chart-line"></i> Dashboard</span>
-                    <strong>Theo dõi tiền</strong>
-                </a>
-            </div>
-        </section>
-
-        <nav class="home-quick-strip" aria-label="Điều hướng nhanh">
-            <a href="/?section=source" data-link>
-                <i class="fas fa-code"></i>
-                <span>Source code</span>
-            </a>
-            <a href="/mxh" data-link>
-                <i class="fas fa-share-nodes"></i>
-                <span>Tài khoản MXH</span>
-            </a>
-            <a href="/congdong" data-link>
-                <i class="fas fa-comments"></i>
-                <span>Cộng đồng</span>
-            </a>
-            <a href="/naptien" data-link>
-                <i class="fas fa-wallet"></i>
-                <span>Nạp tiền</span>
-            </a>
-        </nav>
-
-        <section class="categories-section home-compact-section">
-            <div class="home-section-heading">
-                <div>
-                    <span class="home-section-kicker">Danh mục</span>
-                    <h2>Chọn nhanh loại sản phẩm</h2>
-                </div>
-            </div>
+        <!-- Categories -->
+        <div class="categories-section">
+            <h2>Danh mục sản phẩm</h2>
             <div id="categories-list" class="categories-grid">
                 <!-- Categories sẽ được load bằng JS -->
             </div>
-        </section>
+        </div>
 
-        <section id="users-section" class="users-section home-compact-section" style="display: none;">
+        <!-- Users -->
+        <div id="users-section" class="users-section" style="display: none;">
             <div class="section-header">
                 <h2>Tài khoản phù hợp</h2>
             </div>
             <div id="users-grid" class="users-grid"></div>
-        </section>
+        </div>
 
-        <section class="products-section home-compact-section">
+        <!-- Products -->
+        <div class="products-section">
             <div class="section-header">
-                <div>
-                    <span class="home-section-kicker">Marketplace</span>
-                    <h2>Sản phẩm mới nhất</h2>
-                </div>
+                <h2>Sản phẩm mới nhất</h2>
                 <div class="filter-controls">
                     <select id="sort-select">
                         <option value="newest">Mới nhất</option>
@@ -94,9 +64,10 @@
                 <!-- Products sẽ được load bằng JS -->
             </div>
 
+            <!-- Pagination -->
             <div id="pagination" class="pagination">
                 <!-- Pagination sẽ được load bằng JS -->
             </div>
-        </section>
+        </div>
     </div>
 </div>

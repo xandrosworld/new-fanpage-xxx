@@ -114,6 +114,108 @@ async function getTableStats() {
     }
 }
 
+function buildVipTier(totalSpent = 0, purchaseCount = 0) {
+    const spent = Number(totalSpent || 0);
+    const orders = Number(purchaseCount || 0);
+    if (spent >= 5000000 || orders >= 10) {
+        return 'diamond';
+    }
+    if (spent >= 1000000 || orders >= 3) {
+        return 'gold';
+    }
+    return 'silver';
+}
+
+async function getVipCustomerStats() {
+    try {
+        const [rows] = await db.execute(
+            `SELECT
+                u.id,
+                u.email,
+                u.full_name,
+                u.role,
+                u.balance,
+                u.is_verified,
+                u.last_login,
+                COUNT(t.id) AS purchase_count,
+                COALESCE(SUM(CASE WHEN t.amount < 0 THEN -t.amount ELSE 0 END), 0) AS total_spent,
+                COALESCE(SUM(CASE WHEN t.amount < 0 AND t.created_at >= datetime('now', '-30 days') THEN -t.amount ELSE 0 END), 0) AS spent_30d,
+                MAX(t.created_at) AS last_purchase_at
+             FROM users u
+             JOIN transactions t ON t.user_id = u.id AND t.type = 'purchase'
+             WHERE u.role != 'admin'
+             GROUP BY u.id
+             ORDER BY total_spent DESC, purchase_count DESC
+             LIMIT 8`
+        );
+
+        let customers = rows || [];
+        if (!customers.length) {
+            const [fallbackRows] = await db.execute(
+                `SELECT
+                    id,
+                    email,
+                    full_name,
+                    role,
+                    balance,
+                    is_verified,
+                    last_login,
+                    0 AS purchase_count,
+                    0 AS total_spent,
+                    0 AS spent_30d,
+                    NULL AS last_purchase_at
+                 FROM users
+                 WHERE role != 'admin'
+                 ORDER BY balance DESC, last_login DESC
+                 LIMIT 8`
+            );
+            customers = fallbackRows || [];
+        }
+
+        const normalized = customers.map((row) => {
+            const totalSpent = Number(row.total_spent || 0);
+            const purchaseCount = Number(row.purchase_count || 0);
+            const balance = Number(row.balance || 0);
+            const displayName = row.full_name || row.email || `User #${row.id}`;
+            return {
+                id: row.id,
+                email: row.email || '',
+                fullName: row.full_name || '',
+                displayName,
+                role: row.role || 'user',
+                balance,
+                isVerified: Boolean(row.is_verified),
+                purchaseCount,
+                totalSpent,
+                spent30d: Number(row.spent_30d || 0),
+                lastPurchaseAt: row.last_purchase_at || null,
+                lastLogin: row.last_login || null,
+                tier: buildVipTier(totalSpent, purchaseCount)
+            };
+        });
+
+        const series = normalized.map((customer) => ({
+            label: customer.displayName,
+            shortLabel: customer.displayName.length > 10 ? `${customer.displayName.slice(0, 10)}...` : customer.displayName,
+            value: customer.totalSpent || customer.balance || 0
+        }));
+
+        return {
+            customers: normalized,
+            series,
+            totalSpent: normalized.reduce((sum, item) => sum + Number(item.totalSpent || 0), 0),
+            vipCount: normalized.filter((item) => item.tier !== 'silver').length
+        };
+    } catch (error) {
+        return {
+            customers: [],
+            series: [],
+            totalSpent: 0,
+            vipCount: 0
+        };
+    }
+}
+
 async function getUserById(userId) {
     const [rows] = await db.execute(
         'SELECT id, email, role FROM users WHERE id = ?',
@@ -698,6 +800,8 @@ router.get('/dashboard', async (req, res) => {
 
         const systemStats = getSystemStats();
         const requestStats = logService.getRequestStats ? logService.getRequestStats() : null;
+        const requestHourlyStats = logService.getRequestHourlyStats ? logService.getRequestHourlyStats(24) : null;
+        const vipStats = await getVipCustomerStats();
 
         res.json({
             success: true,
@@ -710,7 +814,15 @@ router.get('/dashboard', async (req, res) => {
                 dailyRevenue: normalizeSeries(dailyRows),
                 monthlyRevenue: normalizeSeries(monthlyRows),
                 systemStats,
-                requestStats
+                requestStats,
+                vipCustomers: vipStats.customers,
+                vipCustomerSeries: vipStats.series,
+                vipTotalSpent: vipStats.totalSpent,
+                vipCount: vipStats.vipCount,
+                trafficByHour: requestHourlyStats?.series || [],
+                peakTrafficHour: requestHourlyStats?.peakHour || null,
+                trafficWindowHours: requestHourlyStats?.windowHours || 24,
+                trafficTimezone: requestHourlyStats?.timezone || 'local'
             }
         });
 
